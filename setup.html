@@ -226,7 +226,7 @@
 
     .spell-grid {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-columns: 3fr 1fr;
       gap: 0.8rem;
       align-items: end;
     }
@@ -438,6 +438,73 @@
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzHI6fYAcW5-l1XY2wU47NK143IVBB7LBuCFDmgiNDQt5uN90hiPl38oY9vLnW2O5r/exec';
 
+  const SPELLS = {
+    'Chronomancer': [
+      { name: 'Crumble', cn: 10 }, { name: 'Decay', cn: 12 }, { name: 'Fast Act', cn: 8 },
+      { name: 'Fleet Feet', cn: 10 }, { name: 'Petrify', cn: 10 }, { name: 'Slow', cn: 10 },
+      { name: 'Time Store', cn: 14 }, { name: 'Time Walk', cn: 14 }
+    ],
+    'Elementalist': [
+      { name: 'Call Storm', cn: 12 }, { name: 'Destructive Sphere', cn: 12 }, { name: 'Elemental Ball', cn: 12 },
+      { name: 'Elemental Bolt', cn: 12 }, { name: 'Elemental Hammer', cn: 10 }, { name: 'Elemental Shield', cn: 10 },
+      { name: 'Scatter Shot', cn: 12 }, { name: 'Wall', cn: 10 }
+    ],
+    'Enchanter': [
+      { name: 'Animate Construct', cn: 10 }, { name: 'Control Construct', cn: 12 }, { name: 'Embed Enchantment', cn: 14 },
+      { name: 'Enchant Armour', cn: 8 }, { name: 'Enchant Weapon', cn: 8 }, { name: 'Grenade', cn: 10 },
+      { name: 'Strength', cn: 10 }, { name: 'Telekinesis', cn: 10 }
+    ],
+    'Illusionist': [
+      { name: 'Beauty', cn: 10 }, { name: 'Blink', cn: 12 }, { name: "Fool's Gold", cn: 10 },
+      { name: 'Glow', cn: 10 }, { name: 'Illusionary Soldier', cn: 12 }, { name: 'Invisibility', cn: 12 },
+      { name: 'Teleport', cn: 10 }, { name: 'Transpose', cn: 12 }
+    ],
+    'Necromancer': [
+      { name: 'Animate Skull', cn: 8 }, { name: 'Bone Dart', cn: 10 }, { name: 'Bones of the Earth', cn: 10 },
+      { name: 'Control Undead', cn: 12 }, { name: 'Raise Zombie', cn: 10 }, { name: 'Spell Eater', cn: 12 },
+      { name: 'Steal Health', cn: 10 }, { name: 'Strike Dead', cn: 18 }
+    ],
+    'Sigilist': [
+      { name: 'Absorb Knowledge', cn: 12 }, { name: 'Bridge', cn: 10 }, { name: 'Draining Word', cn: 14 },
+      { name: 'Explosive Rune', cn: 10 }, { name: 'Furious Quill', cn: 10 }, { name: 'Power Word', cn: 14 },
+      { name: 'Push', cn: 8 }, { name: 'Write Scroll', cn: 12 }
+    ],
+    'Soothsayer': [
+      { name: 'Awareness', cn: 12 }, { name: 'Combat Awareness', cn: 12 }, { name: 'Mind Control', cn: 12 },
+      { name: 'Mind Lock', cn: 12 }, { name: 'Reveal Secret', cn: 12 }, { name: 'Suggestion', cn: 12 },
+      { name: 'True Sight', cn: 12 }, { name: 'Wizard Eye', cn: 12 }
+    ],
+    'Summoner': [
+      { name: 'Control Demon', cn: 12 }, { name: 'Imp', cn: 10 }, { name: 'Leap', cn: 10 },
+      { name: 'Plague of Insects', cn: 12 }, { name: 'Planar Tear', cn: 12 }, { name: 'Plane Walk', cn: 10 },
+      { name: 'Possess', cn: 12 }, { name: 'Summon Demon', cn: 12 }
+    ],
+    'Thaumaturge': [
+      { name: 'Banish', cn: 10 }, { name: 'Blinding Light', cn: 10 }, { name: 'Circle of Protection', cn: 10 },
+      { name: 'Destroy Undead', cn: 10 }, { name: 'Dispel', cn: 8 }, { name: 'Heal', cn: 8 },
+      { name: 'Miraculous Cure', cn: 14 }, { name: 'Shield', cn: 8 }
+    ],
+    'Witch': [
+      { name: 'Animal Companion', cn: 12 }, { name: 'Brew Potion', cn: 12 }, { name: 'Control Animal', cn: 12 },
+      { name: 'Curse', cn: 10 }, { name: 'Familiar', cn: 10 }, { name: 'Fog', cn: 10 },
+      { name: 'Mud', cn: 8 }, { name: 'Poison Dart', cn: 10 }
+    ]
+  };
+
+  function buildSpellOptions() {
+    const wizardSchool = document.getElementById('school').value;
+    const schools = Object.keys(SPELLS);
+    const ordered = wizardSchool && SPELLS[wizardSchool]
+      ? [wizardSchool, ...schools.filter(s => s !== wizardSchool)]
+      : schools;
+    return ordered.map(school => {
+      const options = SPELLS[school].map(s =>
+        `<option value="${school}|${s.name}|${s.cn}">${s.name} (${s.cn})</option>`
+      ).join('');
+      return `<optgroup label="${school}">${options}</optgroup>`;
+    }).join('');
+  }
+
   const SOLDIER_TYPES = [
     'Apothecary','Archer','Barbarian','Bear','Cave Troll','Construct',
     'Crossbowman','Demon','Guard','Infantryman','Knight','Leap',
@@ -475,12 +542,13 @@
       <button class="btn-remove" onclick="removeEntry('spell-${id}')">Remove</button>
       <div class="spell-grid">
         <div class="field">
-          <label>Spell Name</label>
-          <input type="text" name="spell_name_${id}" placeholder="e.g. Leap">
-        </div>
-        <div class="field">
-          <label>School</label>
-          <input type="text" name="spell_school_${id}" placeholder="e.g. Chronomancer">
+          <label>Spell</label>
+          <select name="spell_select_${id}" onchange="onSpellSelect('${id}')">
+            <option value="">— Select spell —</option>
+            ${buildSpellOptions()}
+          </select>
+          <input type="hidden" name="spell_name_${id}">
+          <input type="hidden" name="spell_school_${id}">
         </div>
         <div class="field">
           <label>Casting #</label>
@@ -489,6 +557,15 @@
       </div>
     `;
     document.getElementById('spell-list').appendChild(div);
+  }
+
+  function onSpellSelect(id) {
+    const val = document.querySelector(`[name="spell_select_${id}"]`).value;
+    if (!val) return;
+    const [school, name, cn] = val.split('|');
+    document.querySelector(`[name="spell_name_${id}"]`).value = name;
+    document.querySelector(`[name="spell_school_${id}"]`).value = school;
+    document.querySelector(`[name="spell_cn_${id}"]`).value = cn;
   }
 
   // ---- SOLDIERS ----
