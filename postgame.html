@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frostgrave — Post-Game Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+    :root {
+      --ice:    #c8dfe8;
+      --deep:   #0d1f2d;
+      --frost:  #7ab3c8;
+      --stone:  #2a3a47;
+      --rune:   #a0c4d8;
+      --gold:   #c9a84c;
+      --danger: #8b3a3a;
+      --text:   #dce8ef;
+      --muted:  #6a8a9a;
+      --border: #2e4a5a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--deep);
+      background-image:
+        radial-gradient(ellipse at 20% 0%, #1a3a4a 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 100%, #0a1a28 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23162a38' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      color: var(--text);
+      font-family: 'Crimson Text', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .container { max-width: 820px; margin: 0 auto; }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 2.2rem;
+      color: var(--ice);
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 40px rgba(122,179,200,0.3);
+      margin-bottom: 0.3rem;
+    }
+
+    header p { color: var(--muted); font-style: italic; font-size: 1rem; }
+
+    .section {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.6rem 2rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--frost);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .field { margin-bottom: 1.1rem; }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-family: 'Cinzel', serif;
+      color: var(--rune);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.3rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text);
+      font-family: 'Crimson Text', serif;
+      font-size: 1rem;
+      padding: 0.5rem 0.75rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus { border-color: var(--frost); }
+    select option { background: var(--deep); }
+
+    /* Player count selector */
+    .player-count-btns {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    .pc-btn {
+      flex: 1;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .pc-btn:hover { border-color: var(--frost); color: var(--frost); }
+
+    .pc-btn.active {
+      background: rgba(122,179,200,0.12);
+      border-color: var(--frost);
+      color: var(--ice);
+    }
+
+    /* Warband blocks */
+    .warband-block {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 1.4rem;
+      overflow: hidden;
+    }
+
+    .warband-header {
+      background: rgba(122,179,200,0.07);
+      border-bottom: 1px solid var(--border);
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      color: var(--frost);
+      letter-spacing: 0.08em;
+      padding: 0.8rem 1.2rem;
+    }
+
+    .warband-body { padding: 1.2rem; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .two-col .field { margin-bottom: 0; }
+
+    /* Soldier casualty rows */
+    .casualty-list { margin-top: 0.5rem; }
+
+    .casualty-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr auto;
+      gap: 0.6rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .casualty-row select, .casualty-row input { margin-bottom: 0; }
+
+    .btn-remove-small {
+      background: none;
+      border: 1px solid var(--danger);
+      border-radius: 3px;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.5rem;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-remove-small:hover { background: var(--danger); color: white; }
+
+    .btn-add-small {
+      background: none;
+      border: 1px dashed var(--border);
+      border-radius: 3px;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      padding: 0.4rem 0.8rem;
+      transition: all 0.2s;
+      margin-top: 0.3rem;
+    }
+
+    .btn-add-small:hover { border-color: var(--frost); color: var(--frost); }
+
+    /* Items found */
+    .item-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 0.6rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Injuries */
+    .injury-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr auto;
+      gap: 0.6rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .subsection-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin: 1rem 0 0.5rem;
+    }
+
+    /* Submit */
+    .btn-submit {
+      background: linear-gradient(135deg, #1a3a50, #0d2535);
+      border: 1px solid var(--frost);
+      border-radius: 3px;
+      color: var(--ice);
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      padding: 1rem 2rem;
+      text-transform: uppercase;
+      transition: all 0.25s;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: linear-gradient(135deg, #22485f, #152d40);
+      box-shadow: 0 0 20px rgba(122,179,200,0.2);
+    }
+
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .status-msg {
+      border-radius: 3px;
+      font-style: italic;
+      margin-top: 1rem;
+      padding: 0.8rem 1rem;
+      text-align: center;
+      display: none;
+    }
+
+    .status-msg.success {
+      background: rgba(50,120,80,0.2);
+      border: 1px solid #3a7a50;
+      color: #7acca0;
+      display: block;
+    }
+
+    .status-msg.error {
+      background: rgba(139,58,58,0.2);
+      border: 1px solid var(--danger);
+      color: #c08080;
+      display: block;
+    }
+
+    #warband-sections { margin-top: 1rem; }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>After-Action Report</h1>
+    <p>Record what happened in the ruins — together, while it's fresh</p>
+  </header>
+
+  <!-- GAME INFO -->
+  <div class="section">
+    <div class="section-title">Game Details</div>
+    <div class="two-col">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="game_date">
+      </div>
+      <div class="field">
+        <label>Recorded By</label>
+        <input type="text" id="recorded_by" placeholder="Your name">
+      </div>
+    </div>
+    <div class="field">
+      <label>Scenario</label>
+      <select id="scenario">
+        <option value="">— Select scenario —</option>
+        <option>The Well of Dreams and Sorrows</option>
+        <option>The Mausoleum</option>
+        <option>The Silent Tower</option>
+        <option>The Library</option>
+        <option>The Living Museum</option>
+        <option>The Worm Hunts</option>
+        <option>The Haunted Houses</option>
+        <option>The Genie in the Bottle</option>
+        <option>The Keep</option>
+        <option>The Complex Temple</option>
+        <option>The Orb</option>
+        <option>The Ice Storm</option>
+        <option>The Summoning Bell</option>
+        <option>The Right Hand and the Left Hand</option>
+        <option>The Treasure Phantasmal</option>
+        <option>The Mine Cart</option>
+        <option>The Lock Box</option>
+        <option>The Steam Vents</option>
+        <option>The Swirling Mist</option>
+        <option>The Mine Field</option>
+        <option>Custom / Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Notes (optional)</label>
+      <textarea id="game_notes" rows="2" placeholder="Memorable moments, house rules used, etc."></textarea>
+    </div>
+
+    <div class="field">
+      <label>Number of Warbands</label>
+      <div class="player-count-btns">
+        <button class="pc-btn" onclick="setPlayerCount(2)">2</button>
+        <button class="pc-btn" onclick="setPlayerCount(3)">3</button>
+        <button class="pc-btn" onclick="setPlayerCount(4)">4</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DYNAMIC WARBAND SECTIONS -->
+  <div id="warband-sections"></div>
+
+  <!-- SUBMIT (hidden until player count chosen) -->
+  <div class="section hidden" id="submit-section">
+    <div class="section-title">Commit the Record</div>
+    <button class="btn-submit" id="submit-btn" onclick="submitGame()">
+      Submit After-Action Report
+    </button>
+    <div class="status-msg" id="status-msg"></div>
+  </div>
+
+</div>
+
+<script>
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzHI6fYAcW5-l1XY2wU47NK143IVBB7LBuCFDmgiNDQt5uN90hiPl38oY9vLnW2O5r/exec';
+
+  // Set today's date as default
+  document.getElementById('game_date').value = new Date().toISOString().split('T')[0];
+
+  let playerCount = 0;
+  let warbandData = []; // loaded from sheet
+  let soldierData = []; // loaded from sheet
+
+  // Load warband data from Apps Script on page load
+  async function loadWarbands() {
+    try {
+      const res = await fetch(APPS_SCRIPT_URL + '?action=getWarbands');
+      const data = await res.json();
+      if (data.success) {
+        warbandData = data.warbands.filter(w => w.status === 'active');
+        soldierData = warbandData.flatMap(w =>
+          (w.soldiers || []).filter(s => s.status === 'active' || s.status === 'recovering')
+        );
+      }
+    } catch (e) {
+      console.warn('Could not load warband data:', e);
+    }
+  }
+
+  loadWarbands();
+
+  function setPlayerCount(n) {
+    playerCount = n;
+    document.querySelectorAll('.pc-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    buildWarbandSections(n);
+    document.getElementById('submit-section').classList.remove('hidden');
+  }
+
+  function buildWarbandSections(n) {
+    const container = document.getElementById('warband-sections');
+    container.innerHTML = '';
+    for (let i = 1; i <= n; i++) {
+      container.appendChild(buildWarbandBlock(i));
+    }
+  }
+
+  function buildWarbandBlock(index) {
+    const div = document.createElement('div');
+    div.className = 'section';
+    div.id = 'wb-block-' + index;
+
+    // Warband selector options
+    const wbOptions = warbandData.length > 0
+      ? warbandData.map(w =>
+          `<option value="${w.warband_id}">${w.wizard_name} (${w.player_name})</option>`
+        ).join('')
+      : '<option value="">No warbands loaded — enter ID manually</option>';
+
+    div.innerHTML = `
+      <div class="section-title">Warband ${index}</div>
+
+      <div class="field">
+        <label>Warband</label>
+        <select id="wb_select_${index}" onchange="onWarbandSelect(${index})">
+          <option value="">— Select warband —</option>
+          ${wbOptions}
+        </select>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label>Treasure Tokens Collected</label>
+          <input type="number" id="wb_treasure_${index}" min="0" max="10" value="0">
+        </div>
+        <div class="field">
+          <label>Gold Earned (from treasure)</label>
+          <input type="number" id="wb_gold_${index}" min="0" value="0">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>XP Earned</label>
+        <input type="number" id="wb_xp_${index}" min="0" value="0">
+      </div>
+
+      <!-- SOLDIER CASUALTIES -->
+      <div class="subsection-label">Soldier Casualties</div>
+      <div class="casualty-list" id="casualties_${index}"></div>
+      <button class="btn-add-small" onclick="addCasualty(${index})">+ Add Casualty</button>
+
+      <!-- ITEMS FOUND -->
+      <div class="subsection-label">Items Found</div>
+      <div id="items_${index}"></div>
+      <button class="btn-add-small" onclick="addItem(${index})">+ Add Item</button>
+
+      <!-- PERMANENT INJURIES -->
+      <div class="subsection-label">Permanent Injuries (Wizard / Apprentice)</div>
+      <div id="injuries_${index}"></div>
+      <button class="btn-add-small" onclick="addInjury(${index})">+ Add Injury</button>
+    `;
+
+    return div;
+  }
+
+  function onWarbandSelect(index) {
+    // Could pre-populate soldier dropdowns based on selected warband
+    // For now just clears existing casualties
+    document.getElementById('casualties_' + index).innerHTML = '';
+  }
+
+  function getSoldiersForWarband(wbIndex) {
+    const wbId = document.getElementById('wb_select_' + wbIndex).value;
+    const wb = warbandData.find(w => w.warband_id === wbId);
+    return wb ? (wb.soldiers || []).filter(s => s.status !== 'dead') : [];
+  }
+
+  // ---- CASUALTIES ----
+  let casualtyCount = 0;
+
+  function addCasualty(wbIndex) {
+    casualtyCount++;
+    const id = `cas_${wbIndex}_${casualtyCount}`;
+    const soldiers = getSoldiersForWarband(wbIndex);
+    const solOptions = soldiers.length > 0
+      ? soldiers.map(s =>
+          `<option value="${s.soldier_id}">${s.soldier_name} (${s.soldier_type})</option>`
+        ).join('')
+      : '<option value="">Enter soldier ID manually</option>';
+
+    const div = document.createElement('div');
+    div.className = 'casualty-row';
+    div.id = id;
+    div.innerHTML = `
+      <select name="cas_soldier_${id}">
+        <option value="">— Soldier —</option>
+        ${solOptions}
+      </select>
+      <select name="cas_result_${id}">
+        <option value="dead">Killed</option>
+        <option value="recovering">Recovering (miss next game)</option>
+      </select>
+      <button class="btn-remove-small" onclick="document.getElementById('${id}').remove()">✕</button>
+    `;
+    document.getElementById('casualties_' + wbIndex).appendChild(div);
+  }
+
+  // ---- ITEMS ----
+  let itemCount = 0;
+
+  function addItem(wbIndex) {
+    itemCount++;
+    const id = `itm_${wbIndex}_${itemCount}`;
+    const div = document.createElement('div');
+    div.className = 'item-row';
+    div.id = id;
+    div.innerHTML = `
+      <select name="item_type_${id}">
+        <option value="potion">Potion</option>
+        <option value="scroll">Scroll</option>
+        <option value="grimoire">Grimoire</option>
+        <option value="magic_weapon">Magic Weapon</option>
+        <option value="magic_armour">Magic Armour</option>
+        <option value="magic_item">Magic Item</option>
+      </select>
+      <input type="text" name="item_name_${id}" placeholder="Name / description">
+      <button class="btn-remove-small" onclick="document.getElementById('${id}').remove()">✕</button>
+    `;
+    document.getElementById('items_' + wbIndex).appendChild(div);
+  }
+
+  // ---- INJURIES ----
+  let injuryCount = 0;
+
+  function addInjury(wbIndex) {
+    injuryCount++;
+    const id = `inj_${wbIndex}_${injuryCount}`;
+    const div = document.createElement('div');
+    div.className = 'injury-row';
+    div.id = id;
+    div.innerHTML = `
+      <select name="inj_target_${id}">
+        <option value="wizard">Wizard</option>
+        <option value="apprentice">Apprentice</option>
+      </select>
+      <input type="text" name="inj_desc_${id}" placeholder="Describe the permanent injury">
+      <button class="btn-remove-small" onclick="document.getElementById('${id}').remove()">✕</button>
+    `;
+    document.getElementById('injuries_' + wbIndex).appendChild(div);
+  }
+
+  // ---- COLLECT WARBAND DATA ----
+  function collectWarbands() {
+    const warbands = [];
+    for (let i = 1; i <= playerCount; i++) {
+      const warband_id = document.getElementById('wb_select_' + i).value;
+      if (!warband_id) continue;
+
+      const xp_earned   = parseInt(document.getElementById('wb_xp_' + i).value) || 0;
+      const gold_earned = parseInt(document.getElementById('wb_gold_' + i).value) || 0;
+
+      // Casualties
+      const soldiers_killed = [];
+      const soldiers_recovering = [];
+      document.querySelectorAll(`#casualties_${i} .casualty-row`).forEach(row => {
+        const id = row.id;
+        const soldierEl = row.querySelector(`[name^="cas_soldier_"]`);
+        const resultEl  = row.querySelector(`[name^="cas_result_"]`);
+        if (soldierEl && soldierEl.value) {
+          if (resultEl.value === 'dead') soldiers_killed.push(soldierEl.value);
+          else soldiers_recovering.push(soldierEl.value);
+        }
+      });
+
+      // Items
+      const items_found = [];
+      document.querySelectorAll(`#items_${i} .item-row`).forEach(row => {
+        const id = row.id;
+        const typeEl = row.querySelector(`[name^="item_type_"]`);
+        const nameEl = row.querySelector(`[name^="item_name_"]`);
+        if (nameEl && nameEl.value.trim()) {
+          items_found.push({
+            item_type: typeEl.value,
+            item_name: nameEl.value.trim()
+          });
+        }
+      });
+
+      // Injuries
+      const injuries = [];
+      const wb = warbandData.find(w => w.warband_id === warband_id);
+      document.querySelectorAll(`#injuries_${i} .injury-row`).forEach(row => {
+        const targetEl = row.querySelector(`[name^="inj_target_"]`);
+        const descEl   = row.querySelector(`[name^="inj_desc_"]`);
+        if (descEl && descEl.value.trim()) {
+          const target_type = targetEl.value;
+          const target_name = target_type === 'wizard'
+            ? (wb ? wb.wizard_name : 'Wizard')
+            : (wb ? wb.apprentice_name : 'Apprentice');
+          injuries.push({ target_type, target_name, injury_description: descEl.value.trim() });
+        }
+      });
+
+      warbands.push({ warband_id, xp_earned, gold_earned,
+                      soldiers_killed, soldiers_recovering,
+                      items_found, injuries });
+    }
+    return warbands;
+  }
+
+  // ---- SUBMIT ----
+  async function submitGame() {
+    const btn = document.getElementById('submit-btn');
+    const msg = document.getElementById('status-msg');
+    msg.className = 'status-msg';
+
+    const date     = document.getElementById('game_date').value;
+    const scenario = document.getElementById('scenario').value;
+    const recorded_by = document.getElementById('recorded_by').value.trim();
+
+    if (!date || !scenario || !recorded_by) {
+      msg.className = 'status-msg error';
+      msg.textContent = 'Please fill in date, scenario, and your name.';
+      return;
+    }
+
+    const warbands = collectWarbands();
+    if (warbands.length === 0) {
+      msg.className = 'status-msg error';
+      msg.textContent = 'Please select at least one warband.';
+      return;
+    }
+
+    const payload = {
+      action: 'submitGame',
+      date,
+      scenario,
+      recorded_by,
+      notes: document.getElementById('game_notes').value.trim(),
+      warbands
+    };
+
+    btn.disabled = true;
+    btn.textContent = 'Recording...';
+
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        msg.className = 'status-msg success';
+        msg.textContent = `Game recorded! ID: ${data.game_id}. The city remembers all.`;
+        btn.textContent = 'Submitted';
+      } else {
+        throw new Error(data.error || 'Unknown error');
+      }
+    } catch (err) {
+      msg.className = 'status-msg error';
+      msg.textContent = 'Something went wrong: ' + err.message;
+      btn.disabled = false;
+      btn.textContent = 'Submit After-Action Report';
+    }
+  }
+</script>
+</body>
+</html>

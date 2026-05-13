@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frostgrave — New Warband</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+    :root {
+      --ice:       #c8dfe8;
+      --deep:      #0d1f2d;
+      --frost:     #7ab3c8;
+      --stone:     #2a3a47;
+      --rune:      #a0c4d8;
+      --gold:      #c9a84c;
+      --danger:    #8b3a3a;
+      --text:      #dce8ef;
+      --muted:     #6a8a9a;
+      --border:    #2e4a5a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--deep);
+      background-image:
+        radial-gradient(ellipse at 20% 0%, #1a3a4a 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 100%, #0a1a28 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23162a38' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      color: var(--text);
+      font-family: 'Crimson Text', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--ice);
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 40px rgba(122, 179, 200, 0.3);
+      margin-bottom: 0.4rem;
+    }
+
+    header p {
+      color: var(--muted);
+      font-style: italic;
+      font-size: 1rem;
+    }
+
+    .section {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.8rem 2rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--frost);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.4rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .field {
+      margin-bottom: 1.2rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-family: 'Cinzel', serif;
+      color: var(--rune);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.35rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text);
+      font-family: 'Crimson Text', serif;
+      font-size: 1rem;
+      padding: 0.55rem 0.8rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--frost);
+    }
+
+    select option {
+      background: var(--deep);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+    }
+
+    .stat-field label {
+      font-size: 0.75rem;
+    }
+
+    .stat-field input {
+      text-align: center;
+      font-size: 1.1rem;
+    }
+
+    .apprentice-note {
+      background: rgba(122, 179, 200, 0.07);
+      border: 1px solid rgba(122, 179, 200, 0.2);
+      border-radius: 3px;
+      color: var(--muted);
+      font-style: italic;
+      font-size: 0.9rem;
+      padding: 0.7rem 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    /* Soldiers */
+    .soldier-entry {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      background: rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    .soldier-entry h4 {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+      letter-spacing: 0.06em;
+    }
+
+    .soldier-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .soldier-grid .field {
+      margin-bottom: 0;
+    }
+
+    .btn-remove {
+      position: absolute;
+      top: 0.8rem;
+      right: 0.8rem;
+      background: none;
+      border: 1px solid var(--danger);
+      border-radius: 3px;
+      color: var(--danger);
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .btn-remove:hover {
+      background: var(--danger);
+      color: var(--text);
+    }
+
+    .btn-add {
+      background: none;
+      border: 1px dashed var(--border);
+      border-radius: 3px;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      padding: 0.7rem;
+      text-align: center;
+      transition: all 0.2s;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    .btn-add:hover {
+      border-color: var(--frost);
+      color: var(--frost);
+    }
+
+    /* Spells */
+    .spell-entry {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1rem 1rem 1rem 1rem;
+      margin-bottom: 0.8rem;
+      background: rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    .spell-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 0.8rem;
+      align-items: end;
+    }
+
+    .spell-grid .field {
+      margin-bottom: 0;
+    }
+
+    /* Submit */
+    .btn-submit {
+      background: linear-gradient(135deg, #1a3a50, #0d2535);
+      border: 1px solid var(--frost);
+      border-radius: 3px;
+      color: var(--ice);
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      padding: 1rem 2rem;
+      text-transform: uppercase;
+      transition: all 0.25s;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: linear-gradient(135deg, #22485f, #152d40);
+      box-shadow: 0 0 20px rgba(122,179,200,0.2);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status-msg {
+      border-radius: 3px;
+      font-style: italic;
+      margin-top: 1rem;
+      padding: 0.8rem 1rem;
+      text-align: center;
+      display: none;
+    }
+
+    .status-msg.success {
+      background: rgba(50, 120, 80, 0.2);
+      border: 1px solid #3a7a50;
+      color: #7acca0;
+      display: block;
+    }
+
+    .status-msg.error {
+      background: rgba(139, 58, 58, 0.2);
+      border: 1px solid var(--danger);
+      color: #c08080;
+      display: block;
+    }
+
+    .divider {
+      text-align: center;
+      color: var(--border);
+      margin: 0.5rem 0;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Enter Felstad</h1>
+    <p>Register your warband before the campaign begins</p>
+  </header>
+
+  <!-- PLAYER & WIZARD -->
+  <div class="section">
+    <div class="section-title">Wizard & Player</div>
+
+    <div class="field">
+      <label>Player Name</label>
+      <input type="text" id="player_name" placeholder="Your real name" required>
+    </div>
+    <div class="field">
+      <label>Wizard Name</label>
+      <input type="text" id="wizard_name" placeholder="Name of your wizard" required>
+    </div>
+    <div class="field">
+      <label>School of Magic</label>
+      <select id="school" required>
+        <option value="">— Select a school —</option>
+        <option>Chronomancer</option>
+        <option>Elementalist</option>
+        <option>Enchanter</option>
+        <option>Illusionist</option>
+        <option>Necromancer</option>
+        <option>Sigilist</option>
+        <option>Soothsayer</option>
+        <option>Summoner</option>
+        <option>Thaumaturge</option>
+        <option>Witch</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Wizard Photo URL (Google Drive link)</label>
+      <input type="url" id="wizard_photo_url" placeholder="https://drive.google.com/...">
+    </div>
+  </div>
+
+  <!-- WIZARD STATS -->
+  <div class="section">
+    <div class="section-title">Wizard Stats</div>
+    <div class="stat-grid">
+      <div class="stat-field field">
+        <label>Move</label>
+        <input type="number" id="move" value="6" min="1" max="20">
+      </div>
+      <div class="stat-field field">
+        <label>Fight</label>
+        <input type="number" id="fight" value="2" min="-10" max="20">
+      </div>
+      <div class="stat-field field">
+        <label>Shoot</label>
+        <input type="number" id="shoot" value="0" min="-10" max="20">
+      </div>
+      <div class="stat-field field">
+        <label>Armour</label>
+        <input type="number" id="armour" value="11" min="1" max="20">
+      </div>
+      <div class="stat-field field">
+        <label>Will</label>
+        <input type="number" id="will" value="4" min="-10" max="20">
+      </div>
+      <div class="stat-field field">
+        <label>Health</label>
+        <input type="number" id="health" value="14" min="1" max="30">
+      </div>
+    </div>
+  </div>
+
+  <!-- APPRENTICE -->
+  <div class="section">
+    <div class="section-title">Apprentice</div>
+    <div class="apprentice-note">
+      Apprentice stats are derived from your wizard. Fight, Will, and Health are wizard −2.
+      Move, Shoot, and Armour are identical. These update automatically.
+    </div>
+    <div class="field">
+      <label>Apprentice Name</label>
+      <input type="text" id="apprentice_name" placeholder="Name of your apprentice" required>
+    </div>
+    <div class="field">
+      <label>Apprentice Photo URL (Google Drive link)</label>
+      <input type="url" id="apprentice_photo_url" placeholder="https://drive.google.com/...">
+    </div>
+    <div class="stat-grid" style="margin-top:1rem; opacity:0.6; pointer-events:none;">
+      <div class="stat-field field">
+        <label>Move</label>
+        <input type="number" id="app_move" readonly>
+      </div>
+      <div class="stat-field field">
+        <label>Fight</label>
+        <input type="number" id="app_fight" readonly>
+      </div>
+      <div class="stat-field field">
+        <label>Shoot</label>
+        <input type="number" id="app_shoot" readonly>
+      </div>
+      <div class="stat-field field">
+        <label>Armour</label>
+        <input type="number" id="app_armour" readonly>
+      </div>
+      <div class="stat-field field">
+        <label>Will</label>
+        <input type="number" id="app_will" readonly>
+      </div>
+      <div class="stat-field field">
+        <label>Health</label>
+        <input type="number" id="app_health" readonly>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPELLS -->
+  <div class="section">
+    <div class="section-title">Spells</div>
+    <div id="spell-list"></div>
+    <button class="btn-add" onclick="addSpell()">+ Add Spell</button>
+  </div>
+
+  <!-- SOLDIERS -->
+  <div class="section">
+    <div class="section-title">Soldiers</div>
+    <div id="soldier-list"></div>
+    <button class="btn-add" onclick="addSoldier()">+ Add Soldier</button>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="section">
+    <div class="section-title">Commit to the Frozen City</div>
+    <button class="btn-submit" id="submit-btn" onclick="submitWarband()">
+      Register Warband
+    </button>
+    <div class="status-msg" id="status-msg"></div>
+  </div>
+
+</div>
+
+<script>
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzHI6fYAcW5-l1XY2wU47NK143IVBB7LBuCFDmgiNDQt5uN90hiPl38oY9vLnW2O5r/exec';
+
+  const SOLDIER_TYPES = [
+    'Apothecary','Archer','Barbarian','Bear','Cave Troll','Construct',
+    'Crossbowman','Demon','Guard','Infantryman','Knight','Leap',
+    'Man-at-Arms','Marksman','Ranger','Templar','Thief','Thug',
+    'Tracker','Treasure Hunter','War Hound','Witch Hound','Zombie'
+  ];
+
+  // Live apprentice stat preview
+  ['move','fight','shoot','armour','will','health'].forEach(stat => {
+    document.getElementById(stat).addEventListener('input', updateApprentice);
+  });
+
+  function updateApprentice() {
+    const get = id => parseInt(document.getElementById(id).value) || 0;
+    document.getElementById('app_move').value   = get('move');
+    document.getElementById('app_fight').value  = get('fight') - 2;
+    document.getElementById('app_shoot').value  = get('shoot');
+    document.getElementById('app_armour').value = get('armour');
+    document.getElementById('app_will').value   = get('will') - 2;
+    document.getElementById('app_health').value = get('health') - 2;
+  }
+
+  updateApprentice();
+
+  // ---- SPELLS ----
+  let spellCount = 0;
+
+  function addSpell() {
+    spellCount++;
+    const id = spellCount;
+    const div = document.createElement('div');
+    div.className = 'spell-entry';
+    div.id = 'spell-' + id;
+    div.innerHTML = `
+      <button class="btn-remove" onclick="removeEntry('spell-${id}')">Remove</button>
+      <div class="spell-grid">
+        <div class="field">
+          <label>Spell Name</label>
+          <input type="text" name="spell_name_${id}" placeholder="e.g. Leap">
+        </div>
+        <div class="field">
+          <label>School</label>
+          <input type="text" name="spell_school_${id}" placeholder="e.g. Chronomancer">
+        </div>
+        <div class="field">
+          <label>Casting #</label>
+          <input type="number" name="spell_cn_${id}" min="0" max="20" value="12">
+        </div>
+      </div>
+    `;
+    document.getElementById('spell-list').appendChild(div);
+  }
+
+  // ---- SOLDIERS ----
+  let soldierCount = 0;
+
+  function addSoldier() {
+    soldierCount++;
+    const id = soldierCount;
+    const options = SOLDIER_TYPES.map(t => `<option>${t}</option>`).join('');
+    const div = document.createElement('div');
+    div.className = 'soldier-entry';
+    div.id = 'soldier-' + id;
+    div.innerHTML = `
+      <h4>Soldier ${id}</h4>
+      <button class="btn-remove" onclick="removeEntry('soldier-${id}')">Remove</button>
+      <div class="soldier-grid">
+        <div class="field">
+          <label>Name</label>
+          <input type="text" name="soldier_name_${id}" placeholder="Character name">
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <select name="soldier_type_${id}">
+            <option value="">— Select —</option>
+            ${options}
+          </select>
+        </div>
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>Photo URL (Google Drive link)</label>
+          <input type="url" name="soldier_photo_${id}" placeholder="https://drive.google.com/...">
+        </div>
+      </div>
+    `;
+    document.getElementById('soldier-list').appendChild(div);
+  }
+
+  function removeEntry(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
+  // ---- COLLECT SPELLS ----
+  function collectSpells() {
+    const spells = [];
+    document.querySelectorAll('.spell-entry').forEach(entry => {
+      const id = entry.id.replace('spell-', '');
+      const name = entry.querySelector(`[name="spell_name_${id}"]`).value.trim();
+      const school = entry.querySelector(`[name="spell_school_${id}"]`).value.trim();
+      const cn = parseInt(entry.querySelector(`[name="spell_cn_${id}"]`).value) || 12;
+      if (name) {
+        spells.push({ spell_name: name, school, base_casting_number: cn });
+      }
+    });
+    return spells;
+  }
+
+  // ---- COLLECT SOLDIERS ----
+  function collectSoldiers() {
+    const soldiers = [];
+    document.querySelectorAll('.soldier-entry').forEach(entry => {
+      const id = entry.id.replace('soldier-', '');
+      const name = entry.querySelector(`[name="soldier_name_${id}"]`).value.trim();
+      const type = entry.querySelector(`[name="soldier_type_${id}"]`).value;
+      const photo = entry.querySelector(`[name="soldier_photo_${id}"]`).value.trim();
+      if (name && type) {
+        soldiers.push({ soldier_name: name, soldier_type: type, photo_url: photo });
+      }
+    });
+    return soldiers;
+  }
+
+  // ---- SUBMIT ----
+  async function submitWarband() {
+    const btn = document.getElementById('submit-btn');
+    const msg = document.getElementById('status-msg');
+    msg.className = 'status-msg';
+
+    const player_name = document.getElementById('player_name').value.trim();
+    const wizard_name = document.getElementById('wizard_name').value.trim();
+    const school      = document.getElementById('school').value;
+    const apprentice_name = document.getElementById('apprentice_name').value.trim();
+
+    if (!player_name || !wizard_name || !school || !apprentice_name) {
+      msg.className = 'status-msg error';
+      msg.textContent = 'Please fill in player name, wizard name, school, and apprentice name.';
+      return;
+    }
+
+    const payload = {
+      action: 'createWarband',
+      player_name,
+      wizard_name,
+      wizard_photo_url: document.getElementById('wizard_photo_url').value.trim(),
+      school,
+      move:   parseInt(document.getElementById('move').value),
+      fight:  parseInt(document.getElementById('fight').value),
+      shoot:  parseInt(document.getElementById('shoot').value),
+      armour: parseInt(document.getElementById('armour').value),
+      will:   parseInt(document.getElementById('will').value),
+      health: parseInt(document.getElementById('health').value),
+      apprentice_name,
+      apprentice_photo_url: document.getElementById('apprentice_photo_url').value.trim(),
+      soldiers: collectSoldiers(),
+      spells:   collectSpells()
+    };
+
+    btn.disabled = true;
+    btn.textContent = 'Entering Felstad...';
+
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        msg.className = 'status-msg success';
+        msg.textContent = `Warband registered! ID: ${data.warband_id}. May your wizard survive the cold.`;
+        btn.textContent = 'Registered';
+      } else {
+        throw new Error(data.error || 'Unknown error');
+      }
+    } catch (err) {
+      msg.className = 'status-msg error';
+      msg.textContent = 'Something went wrong: ' + err.message;
+      btn.disabled = false;
+      btn.textContent = 'Register Warband';
+    }
+  }
+</script>
+</body>
+</html>
