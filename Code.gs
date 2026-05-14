@@ -95,7 +95,7 @@ function createWarband(data) {
     data.health,
     data.apprentice_name,
     data.apprentice_photo_url || '',
-    500,                  // starting gold (standard Frostgrave)
+    400,                  // starting gold
     '',                   // base_notes
     'active'              // status
   ]);

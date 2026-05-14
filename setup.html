@@ -327,6 +327,57 @@
       margin: 0.5rem 0;
       font-size: 1.2rem;
     }
+
+    .gold-tracker {
+      background: rgba(201,168,76,0.07);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 3px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1.2rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.9rem;
+    }
+
+    .gold-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.15rem 0;
+      color: var(--text);
+    }
+
+    .gold-divider {
+      border-top: 1px solid rgba(201,168,76,0.3);
+      margin: 0.5rem 0;
+    }
+
+    .gold-remaining {
+      font-weight: 600;
+      color: var(--gold);
+      font-size: 1rem;
+    }
+
+    .soldier-badge {
+      display: inline-block;
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+      padding: 0.1rem 0.4rem;
+      border-radius: 2px;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+    }
+
+    .badge-specialist {
+      background: rgba(160,196,216,0.15);
+      border: 1px solid var(--rune);
+      color: var(--rune);
+    }
+
+    .badge-cost {
+      background: rgba(201,168,76,0.12);
+      border: 1px solid rgba(201,168,76,0.4);
+      color: var(--gold);
+    }
   </style>
 </head>
 <body>
@@ -371,44 +422,9 @@
     </div>
   </div>
 
-  <!-- WIZARD STATS -->
-  <div class="section">
-    <div class="section-title">Wizard Stats</div>
-    <div class="stat-grid">
-      <div class="stat-field field">
-        <label>Move</label>
-        <input type="number" id="move" value="6" min="1" max="20">
-      </div>
-      <div class="stat-field field">
-        <label>Fight</label>
-        <input type="number" id="fight" value="2" min="-10" max="20">
-      </div>
-      <div class="stat-field field">
-        <label>Shoot</label>
-        <input type="number" id="shoot" value="0" min="-10" max="20">
-      </div>
-      <div class="stat-field field">
-        <label>Armour</label>
-        <input type="number" id="armour" value="11" min="1" max="20">
-      </div>
-      <div class="stat-field field">
-        <label>Will</label>
-        <input type="number" id="will" value="4" min="-10" max="20">
-      </div>
-      <div class="stat-field field">
-        <label>Health</label>
-        <input type="number" id="health" value="14" min="1" max="30">
-      </div>
-    </div>
-  </div>
-
   <!-- APPRENTICE -->
   <div class="section">
     <div class="section-title">Apprentice</div>
-    <div class="apprentice-note">
-      Apprentice stats are derived from your wizard. Fight, Will, and Health are wizard −2.
-      Move, Shoot, and Armour are identical. These update automatically.
-    </div>
     <div class="field">
       <label>Apprentice Name</label>
       <input type="text" id="apprentice_name" placeholder="Name of your apprentice" required>
@@ -416,32 +432,6 @@
     <div class="field">
       <label>Apprentice Photo URL (Google Drive link)</label>
       <input type="url" id="apprentice_photo_url" placeholder="https://drive.google.com/...">
-    </div>
-    <div class="stat-grid" style="margin-top:1rem; opacity:0.6; pointer-events:none;">
-      <div class="stat-field field">
-        <label>Move</label>
-        <input type="number" id="app_move" readonly>
-      </div>
-      <div class="stat-field field">
-        <label>Fight</label>
-        <input type="number" id="app_fight" readonly>
-      </div>
-      <div class="stat-field field">
-        <label>Shoot</label>
-        <input type="number" id="app_shoot" readonly>
-      </div>
-      <div class="stat-field field">
-        <label>Armour</label>
-        <input type="number" id="app_armour" readonly>
-      </div>
-      <div class="stat-field field">
-        <label>Will</label>
-        <input type="number" id="app_will" readonly>
-      </div>
-      <div class="stat-field field">
-        <label>Health</label>
-        <input type="number" id="app_health" readonly>
-      </div>
     </div>
   </div>
 
@@ -454,6 +444,19 @@
   <!-- SOLDIERS -->
   <div class="section">
     <div class="section-title">Soldiers</div>
+
+    <div class="gold-tracker">
+      <div class="gold-row"><span>Starting Gold</span><span>400gc</span></div>
+      <div class="gold-row"><span>Apprentice</span><span>−100gc</span></div>
+      <div class="gold-row"><span>Soldiers</span><span id="soldiers-spent">−0gc</span></div>
+      <div class="gold-divider"></div>
+      <div class="gold-row gold-remaining"><span>Remaining</span><span id="gold-remaining">300gc</span></div>
+      <div class="gold-row" style="margin-top:0.4rem; font-size:0.85rem;">
+        <span style="color:var(--muted);">Specialists</span>
+        <span id="specialist-count" style="color:var(--muted);">0 / 4</span>
+      </div>
+    </div>
+
     <div id="soldier-list"></div>
     <button class="btn-add" onclick="addSoldier()">+ Add Soldier</button>
   </div>
@@ -607,32 +610,26 @@
   }
 
   const SOLDIER_TYPES = [
-    'Apothecary','Archer','Barbarian','Bear','Cave Troll','Construct',
-    'Crossbowman','Demon','Guard','Infantryman','Knight','Leap',
-    'Man-at-Arms','Marksman','Ranger','Templar','Thief','Thug',
-    'Tracker','Treasure Hunter','War Hound','Witch Hound','Zombie'
+    { name: 'Apothecary',      cost: 75,  specialist: false },
+    { name: 'Archer',          cost: 75,  specialist: true  },
+    { name: 'Barbarian',       cost: 125, specialist: true  },
+    { name: 'Crossbowman',     cost: 75,  specialist: true  },
+    { name: 'Infantryman',     cost: 50,  specialist: false },
+    { name: 'Knight',          cost: 125, specialist: true  },
+    { name: 'Man-at-Arms',     cost: 75,  specialist: false },
+    { name: 'Marksman',        cost: 125, specialist: true  },
+    { name: 'Ranger',          cost: 125, specialist: true  },
+    { name: 'Templar',         cost: 125, specialist: true  },
+    { name: 'Thief',           cost: 0,   specialist: false },
+    { name: 'Thug',            cost: 0,   specialist: false },
+    { name: 'Tracker',         cost: 100, specialist: true  },
+    { name: 'Treasure Hunter', cost: 100, specialist: true  },
+    { name: 'War Hound',       cost: 10,  specialist: false },
   ];
-
-  // Live apprentice stat preview
-  ['move','fight','shoot','armour','will','health'].forEach(stat => {
-    document.getElementById(stat).addEventListener('input', updateApprentice);
-  });
 
   document.getElementById('school').addEventListener('change', function() {
     buildSpellSection(this.value);
   });
-
-  function updateApprentice() {
-    const get = id => parseInt(document.getElementById(id).value) || 0;
-    document.getElementById('app_move').value   = get('move');
-    document.getElementById('app_fight').value  = get('fight') - 2;
-    document.getElementById('app_shoot').value  = get('shoot');
-    document.getElementById('app_armour').value = get('armour');
-    document.getElementById('app_will').value   = get('will') - 2;
-    document.getElementById('app_health').value = get('health') - 2;
-  }
-
-  updateApprentice();
 
   // ---- SOLDIERS ----
   let soldierCount = 0;
@@ -640,13 +637,17 @@
   function addSoldier() {
     soldierCount++;
     const id = soldierCount;
-    const options = SOLDIER_TYPES.map(t => `<option>${t}</option>`).join('');
+    const options = SOLDIER_TYPES.map(t => {
+      const badge = t.specialist ? ' [Specialist]' : '';
+      const cost  = t.cost > 0 ? ` — ${t.cost}gc` : ' — Free';
+      return `<option value="${t.name}">${t.name}${cost}${badge}</option>`;
+    }).join('');
     const div = document.createElement('div');
     div.className = 'soldier-entry';
     div.id = 'soldier-' + id;
     div.innerHTML = `
       <h4>Soldier ${id}</h4>
-      <button class="btn-remove" onclick="removeEntry('soldier-${id}')">Remove</button>
+      <button class="btn-remove" onclick="removeSoldier('soldier-${id}')">Remove</button>
       <div class="soldier-grid">
         <div class="field">
           <label>Name</label>
@@ -654,7 +655,7 @@
         </div>
         <div class="field">
           <label>Type</label>
-          <select name="soldier_type_${id}">
+          <select name="soldier_type_${id}" onchange="updateGoldTracker()">
             <option value="">— Select —</option>
             ${options}
           </select>
@@ -668,9 +669,30 @@
     document.getElementById('soldier-list').appendChild(div);
   }
 
-  function removeEntry(id) {
+  function removeSoldier(id) {
     const el = document.getElementById(id);
     if (el) el.remove();
+    updateGoldTracker();
+  }
+
+  function updateGoldTracker() {
+    let spent = 0;
+    let specialists = 0;
+    document.querySelectorAll('[name^="soldier_type_"]').forEach(sel => {
+      if (!sel.value) return;
+      const t = SOLDIER_TYPES.find(s => s.name === sel.value);
+      if (!t) return;
+      spent += t.cost;
+      if (t.specialist) specialists++;
+    });
+    const remaining = 300 - spent;
+    document.getElementById('soldiers-spent').textContent = `−${spent}gc`;
+    const remainEl = document.getElementById('gold-remaining');
+    remainEl.textContent = `${remaining}gc`;
+    remainEl.style.color = remaining < 0 ? 'var(--danger)' : 'var(--gold)';
+    const specEl = document.getElementById('specialist-count');
+    specEl.textContent = `${specialists} / 4`;
+    specEl.style.color = specialists > 4 ? 'var(--danger)' : 'var(--muted)';
   }
 
   function onNeutralChange() {
@@ -744,12 +766,7 @@
       wizard_name,
       wizard_photo_url: document.getElementById('wizard_photo_url').value.trim(),
       school,
-      move:   parseInt(document.getElementById('move').value),
-      fight:  parseInt(document.getElementById('fight').value),
-      shoot:  parseInt(document.getElementById('shoot').value),
-      armour: parseInt(document.getElementById('armour').value),
-      will:   parseInt(document.getElementById('will').value),
-      health: parseInt(document.getElementById('health').value),
+      move: 6, fight: 2, shoot: 0, armour: 11, will: 4, health: 14,
       apprentice_name,
       apprentice_photo_url: document.getElementById('apprentice_photo_url').value.trim(),
       soldiers: collectSoldiers(),
