@@ -416,10 +416,7 @@
         <option>Witch</option>
       </select>
     </div>
-    <div class="field">
-      <label>Wizard Photo URL (Google Drive link)</label>
-      <input type="url" id="wizard_photo_url" placeholder="https://drive.google.com/...">
-    </div>
+    <div class="apprentice-note">Send photos of your wizard, apprentice, and soldiers to Zach to have them incorporated.</div>
   </div>
 
   <!-- APPRENTICE -->
@@ -428,10 +425,6 @@
     <div class="field">
       <label>Apprentice Name</label>
       <input type="text" id="apprentice_name" placeholder="Name of your apprentice" required>
-    </div>
-    <div class="field">
-      <label>Apprentice Photo URL (Google Drive link)</label>
-      <input type="url" id="apprentice_photo_url" placeholder="https://drive.google.com/...">
     </div>
   </div>
 
@@ -660,10 +653,6 @@
             ${options}
           </select>
         </div>
-        <div class="field" style="grid-column: 1 / -1;">
-          <label>Photo URL (Google Drive link)</label>
-          <input type="url" name="soldier_photo_${id}" placeholder="https://drive.google.com/...">
-        </div>
       </div>
     `;
     document.getElementById('soldier-list').appendChild(div);
@@ -764,11 +753,11 @@
       action: 'createWarband',
       player_name,
       wizard_name,
-      wizard_photo_url: document.getElementById('wizard_photo_url').value.trim(),
+      wizard_photo_url: '',
       school,
       move: 6, fight: 2, shoot: 0, armour: 11, will: 4, health: 14,
       apprentice_name,
-      apprentice_photo_url: document.getElementById('apprentice_photo_url').value.trim(),
+      apprentice_photo_url: '',
       soldiers: collectSoldiers(),
       spells:   collectSpells()
     };
