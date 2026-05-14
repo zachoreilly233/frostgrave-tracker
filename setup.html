@@ -581,7 +581,7 @@
       return `<optgroup label="${ns}">${opts}</optgroup>`;
     }).join('');
     let neutralHTML = '';
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
       neutralHTML += `<div class="field"><select class="spell-select neutral-spell-select" onchange="onNeutralChange()">
         <option value="">— Select spell —</option>${neutralOpts}</select></div>`;
     }
@@ -600,7 +600,7 @@
       </div>
       <div class="spell-category">
         <div class="spell-category-header">Neutral Schools</div>
-        <div class="spell-category-note">Pick 1 each from any 3 neutral schools (casting number +4)</div>
+        <div class="spell-category-note">Pick 1 each from any 2 neutral schools (casting number +4)</div>
         ${neutralHTML}
       </div>
     `;
