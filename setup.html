@@ -235,6 +235,41 @@
       margin-bottom: 0;
     }
 
+    .spell-category {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1rem;
+      background: rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
+    }
+
+    .spell-category-header {
+      font-family: 'Cinzel', serif;
+      font-size: 0.9rem;
+      color: var(--frost);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3rem;
+    }
+
+    .spell-category-note {
+      color: var(--muted);
+      font-style: italic;
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .spell-allied-block {
+      margin-bottom: 0.8rem;
+    }
+
+    .spell-school-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      color: var(--rune);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.3rem;
+    }
+
     /* Submit */
     .btn-submit {
       background: linear-gradient(135deg, #1a3a50, #0d2535);
@@ -411,10 +446,9 @@
   </div>
 
   <!-- SPELLS -->
-  <div class="section">
+  <div class="section" id="spell-section">
     <div class="section-title">Spells</div>
-    <div id="spell-list"></div>
-    <button class="btn-add" onclick="addSpell()">+ Add Spell</button>
+    <p class="apprentice-note">Select your school of magic above to see spell options.</p>
   </div>
 
   <!-- SOLDIERS -->
@@ -491,18 +525,85 @@
     ]
   };
 
-  function buildSpellOptions() {
-    const wizardSchool = document.getElementById('school').value;
-    const schools = Object.keys(SPELLS);
-    const ordered = wizardSchool && SPELLS[wizardSchool]
-      ? [wizardSchool, ...schools.filter(s => s !== wizardSchool)]
-      : schools;
-    return ordered.map(school => {
-      const options = SPELLS[school].map(s =>
-        `<option value="${school}|${s.name}|${s.cn}">${s.name} (${s.cn})</option>`
+  const SCHOOL_RELATIONS = {
+    'Chronomancer': { allied: ['Elementalist', 'Necromancer', 'Soothsayer'], opposed: 'Enchanter' },
+    'Elementalist':  { allied: ['Chronomancer', 'Enchanter', 'Summoner'],    opposed: 'Illusionist' },
+    'Enchanter':     { allied: ['Elementalist', 'Sigilist', 'Witch'],        opposed: 'Chronomancer' },
+    'Illusionist':   { allied: ['Sigilist', 'Soothsayer', 'Thaumaturge'],    opposed: 'Elementalist' },
+    'Necromancer':   { allied: ['Chronomancer', 'Summoner', 'Witch'],        opposed: 'Thaumaturge' },
+    'Sigilist':      { allied: ['Enchanter', 'Illusionist', 'Thaumaturge'],  opposed: 'Summoner' },
+    'Soothsayer':    { allied: ['Chronomancer', 'Illusionist', 'Thaumaturge'], opposed: 'Witch' },
+    'Summoner':      { allied: ['Elementalist', 'Necromancer', 'Witch'],     opposed: 'Sigilist' },
+    'Thaumaturge':   { allied: ['Illusionist', 'Sigilist', 'Soothsayer'],    opposed: 'Necromancer' },
+    'Witch':         { allied: ['Enchanter', 'Necromancer', 'Summoner'],     opposed: 'Soothsayer' },
+  };
+
+  function buildSpellSection(school) {
+    const section = document.getElementById('spell-section');
+    if (!school) {
+      section.innerHTML = '<div class="section-title">Spells</div><p class="apprentice-note">Select your school of magic above to see spell options.</p>';
+      return;
+    }
+    const rel = SCHOOL_RELATIONS[school];
+    const neutralSchools = Object.keys(SPELLS).filter(s =>
+      s !== school && !rel.allied.includes(s) && s !== rel.opposed
+    );
+
+    // Domain: 3 dropdowns, own school only
+    const domainOpts = SPELLS[school].map(s =>
+      `<option value="${school}|${s.name}|${s.cn}|${s.cn}">${s.name} (CN ${s.cn})</option>`
+    ).join('');
+    let domainHTML = '';
+    for (let i = 0; i < 3; i++) {
+      domainHTML += `<div class="field"><select class="spell-select">
+        <option value="">— Select spell —</option>${domainOpts}</select></div>`;
+    }
+
+    // Allied: 1 dropdown per allied school, CN +2
+    let alliedHTML = '';
+    rel.allied.forEach(ally => {
+      const opts = SPELLS[ally].map(s =>
+        `<option value="${ally}|${s.name}|${s.cn}|${s.cn + 2}">${s.name} (CN ${s.cn + 2})</option>`
       ).join('');
-      return `<optgroup label="${school}">${options}</optgroup>`;
+      alliedHTML += `
+        <div class="spell-allied-block">
+          <div class="spell-school-label">${ally}</div>
+          <div class="field"><select class="spell-select">
+            <option value="">— Select spell —</option>${opts}</select></div>
+        </div>`;
+    });
+
+    // Neutral: 3 dropdowns, optgroups by school, CN +4
+    const neutralOpts = neutralSchools.map(ns => {
+      const opts = SPELLS[ns].map(s =>
+        `<option value="${ns}|${s.name}|${s.cn}|${s.cn + 4}">${s.name} (CN ${s.cn + 4})</option>`
+      ).join('');
+      return `<optgroup label="${ns}">${opts}</optgroup>`;
     }).join('');
+    let neutralHTML = '';
+    for (let i = 0; i < 3; i++) {
+      neutralHTML += `<div class="field"><select class="spell-select">
+        <option value="">— Select spell —</option>${neutralOpts}</select></div>`;
+    }
+
+    section.innerHTML = `
+      <div class="section-title">Spells</div>
+      <div class="spell-category">
+        <div class="spell-category-header">Domain — ${school}</div>
+        <div class="spell-category-note">Pick 3 from your school (casting number as listed)</div>
+        ${domainHTML}
+      </div>
+      <div class="spell-category">
+        <div class="spell-category-header">Allied Schools</div>
+        <div class="spell-category-note">Pick 1 from each allied school (casting number +2)</div>
+        ${alliedHTML}
+      </div>
+      <div class="spell-category">
+        <div class="spell-category-header">Neutral Schools</div>
+        <div class="spell-category-note">Pick 3 from any neutral school (casting number +4)</div>
+        ${neutralHTML}
+      </div>
+    `;
   }
 
   const SOLDIER_TYPES = [
@@ -517,6 +618,10 @@
     document.getElementById(stat).addEventListener('input', updateApprentice);
   });
 
+  document.getElementById('school').addEventListener('change', function() {
+    buildSpellSection(this.value);
+  });
+
   function updateApprentice() {
     const get = id => parseInt(document.getElementById(id).value) || 0;
     document.getElementById('app_move').value   = get('move');
@@ -528,45 +633,6 @@
   }
 
   updateApprentice();
-
-  // ---- SPELLS ----
-  let spellCount = 0;
-
-  function addSpell() {
-    spellCount++;
-    const id = spellCount;
-    const div = document.createElement('div');
-    div.className = 'spell-entry';
-    div.id = 'spell-' + id;
-    div.innerHTML = `
-      <button class="btn-remove" onclick="removeEntry('spell-${id}')">Remove</button>
-      <div class="spell-grid">
-        <div class="field">
-          <label>Spell</label>
-          <select name="spell_select_${id}" onchange="onSpellSelect('${id}')">
-            <option value="">— Select spell —</option>
-            ${buildSpellOptions()}
-          </select>
-          <input type="hidden" name="spell_name_${id}">
-          <input type="hidden" name="spell_school_${id}">
-        </div>
-        <div class="field">
-          <label>Casting #</label>
-          <input type="number" name="spell_cn_${id}" min="0" max="20" value="12">
-        </div>
-      </div>
-    `;
-    document.getElementById('spell-list').appendChild(div);
-  }
-
-  function onSpellSelect(id) {
-    const val = document.querySelector(`[name="spell_select_${id}"]`).value;
-    if (!val) return;
-    const [school, name, cn] = val.split('|');
-    document.querySelector(`[name="spell_name_${id}"]`).value = name;
-    document.querySelector(`[name="spell_school_${id}"]`).value = school;
-    document.querySelector(`[name="spell_cn_${id}"]`).value = cn;
-  }
 
   // ---- SOLDIERS ----
   let soldierCount = 0;
@@ -610,14 +676,16 @@
   // ---- COLLECT SPELLS ----
   function collectSpells() {
     const spells = [];
-    document.querySelectorAll('.spell-entry').forEach(entry => {
-      const id = entry.id.replace('spell-', '');
-      const name = entry.querySelector(`[name="spell_name_${id}"]`).value.trim();
-      const school = entry.querySelector(`[name="spell_school_${id}"]`).value.trim();
-      const cn = parseInt(entry.querySelector(`[name="spell_cn_${id}"]`).value) || 12;
-      if (name) {
-        spells.push({ spell_name: name, school, base_casting_number: cn });
-      }
+    document.querySelectorAll('.spell-select').forEach(select => {
+      const val = select.value;
+      if (!val) return;
+      const [school, name, base_cn, actual_cn] = val.split('|');
+      spells.push({
+        spell_name: name,
+        school,
+        base_casting_number: parseInt(base_cn),
+        casting_number: parseInt(actual_cn)
+      });
     });
     return spells;
   }
