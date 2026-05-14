@@ -450,8 +450,8 @@
       </div>
     </div>
 
+    <div class="apprentice-note" style="margin-bottom:1rem;">Maximum 8 soldiers total, no more than 4 specialists. Leave unused slots blank.</div>
     <div id="soldier-list"></div>
-    <button class="btn-add" onclick="addSoldier()">+ Add Soldier</button>
   </div>
 
   <!-- SUBMIT -->
@@ -724,13 +724,15 @@
       const id = entry.id.replace('soldier-', '');
       const name = entry.querySelector(`[name="soldier_name_${id}"]`).value.trim();
       const type = entry.querySelector(`[name="soldier_type_${id}"]`).value;
-      const photo = entry.querySelector(`[name="soldier_photo_${id}"]`).value.trim();
       if (name && type) {
-        soldiers.push({ soldier_name: name, soldier_type: type, photo_url: photo });
+        soldiers.push({ soldier_name: name, soldier_type: type, photo_url: '' });
       }
     });
     return soldiers;
   }
+
+  // Pre-populate 8 soldier slots
+  for (let i = 0; i < 8; i++) addSoldier();
 
   // ---- SUBMIT ----
   async function submitWarband() {
