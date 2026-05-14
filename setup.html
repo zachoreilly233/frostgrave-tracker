@@ -582,7 +582,7 @@
     }).join('');
     let neutralHTML = '';
     for (let i = 0; i < 3; i++) {
-      neutralHTML += `<div class="field"><select class="spell-select">
+      neutralHTML += `<div class="field"><select class="spell-select neutral-spell-select" onchange="onNeutralChange()">
         <option value="">— Select spell —</option>${neutralOpts}</select></div>`;
     }
 
@@ -600,7 +600,7 @@
       </div>
       <div class="spell-category">
         <div class="spell-category-header">Neutral Schools</div>
-        <div class="spell-category-note">Pick 3 from any neutral school (casting number +4)</div>
+        <div class="spell-category-note">Pick 1 each from any 3 neutral schools (casting number +4)</div>
         ${neutralHTML}
       </div>
     `;
@@ -671,6 +671,22 @@
   function removeEntry(id) {
     const el = document.getElementById(id);
     if (el) el.remove();
+  }
+
+  function onNeutralChange() {
+    const neutralSelects = document.querySelectorAll('.neutral-spell-select');
+    const selectedSchools = new Set();
+    neutralSelects.forEach(sel => {
+      if (sel.value) selectedSchools.add(sel.value.split('|')[0]);
+    });
+    neutralSelects.forEach(sel => {
+      const ownSchool = sel.value ? sel.value.split('|')[0] : null;
+      Array.from(sel.options).forEach(opt => {
+        if (!opt.value) return;
+        const optSchool = opt.value.split('|')[0];
+        opt.disabled = selectedSchools.has(optSchool) && optSchool !== ownSchool;
+      });
+    });
   }
 
   // ---- COLLECT SPELLS ----
