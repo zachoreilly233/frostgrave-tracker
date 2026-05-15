@@ -36,7 +36,6 @@ function doPost(e) {
 }
 
 function doGet(e) {
-  // Allow simple GET requests for reading data (dashboard use)
   try {
     const action = e.parameter.action;
     let result;
@@ -64,7 +63,7 @@ function doGet(e) {
 
 function generateId(prefix, sheet) {
   const data = sheet.getDataRange().getValues();
-  const count = Math.max(data.length, 1); // at least 1 to account for header row
+  const count = Math.max(data.length, 1);
   return prefix + String(count).padStart(3, '0');
 }
 
@@ -100,7 +99,6 @@ function createWarband(data) {
     'active'              // status
   ]);
 
-  // Add soldiers if provided
   if (data.soldiers && data.soldiers.length > 0) {
     data.soldiers.forEach(soldier => {
       addSoldier({
@@ -112,7 +110,6 @@ function createWarband(data) {
     });
   }
 
-  // Add spells if provided
   if (data.spells && data.spells.length > 0) {
     data.spells.forEach(spell => {
       addSpell({
@@ -120,7 +117,7 @@ function createWarband(data) {
         spell_name: spell.spell_name,
         school: spell.school,
         base_casting_number: spell.base_casting_number,
-        casting_number: spell.base_casting_number, // starts equal to base
+        casting_number: spell.base_casting_number,
         category: spell.category || ''
       }, ss);
     });
@@ -153,25 +150,22 @@ function addSoldier(data, ss) {
 }
 
 function killSoldier(soldier_id, ss) {
-  // Set soldier status to dead and mark their carried items as lost
   ss = ss || SpreadsheetApp.openById(SHEET_ID);
   const solSheet = ss.getSheetByName('SOLDIERS');
   const itemSheet = ss.getSheetByName('ITEMS');
 
-  // Update soldier status
   const solData = solSheet.getDataRange().getValues();
   for (let i = 1; i < solData.length; i++) {
     if (solData[i][0] === soldier_id) {
-      solSheet.getRange(i + 1, 5).setValue('dead'); // column 5 = status
+      solSheet.getRange(i + 1, 5).setValue('dead');
       break;
     }
   }
 
-  // Mark carried items as lost (retain carried_by as tombstone)
   const itemData = itemSheet.getDataRange().getValues();
   for (let i = 1; i < itemData.length; i++) {
-    if (itemData[i][6] === soldier_id) { // column 7 = carried_by
-      itemSheet.getRange(i + 1, 6).setValue('lost'); // column 6 = status
+    if (itemData[i][6] === soldier_id) {
+      itemSheet.getRange(i + 1, 6).setValue('lost');
     }
   }
 }
@@ -212,24 +206,35 @@ function addSpell(data, ss) {
   return { success: true, spell_id };
 }
 
+function updateSpellCN(spell_id, new_cn, ss) {
+  ss = ss || SpreadsheetApp.openById(SHEET_ID);
+  const spellSheet = ss.getSheetByName('SPELLS');
+  const data = spellSheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === spell_id) {
+      spellSheet.getRange(i + 1, 6).setValue(new_cn); // col 6 = casting_number
+      break;
+    }
+  }
+}
+
 
 // =============================================================================
 // POST-GAME SUBMISSION
 // =============================================================================
 
 function submitGame(data) {
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  const gameSheet  = ss.getSheetByName('GAMES');
-  const txnSheet   = ss.getSheetByName('TRANSACTIONS');
-  const injSheet   = ss.getSheetByName('INJURIES');
-  const wbSheet    = ss.getSheetByName('WARBANDS');
-  const itemSheet  = ss.getSheetByName('ITEMS');
+  const ss        = SpreadsheetApp.openById(SHEET_ID);
+  const gameSheet = ss.getSheetByName('GAMES');
+  const txnSheet  = ss.getSheetByName('TRANSACTIONS');
+  const injSheet  = ss.getSheetByName('INJURIES');
+  const wbSheet   = ss.getSheetByName('WARBANDS');
+  const itemSheet = ss.getSheetByName('ITEMS');
 
   const timestamp = new Date();
   const game_id = generateId('GM', gameSheet);
   const participating_ids = data.warbands.map(w => w.warband_id).join(', ');
 
-  // Write game record
   gameSheet.appendRow([
     game_id,
     data.date,
@@ -240,71 +245,117 @@ function submitGame(data) {
     data.notes || ''
   ]);
 
-  // Process each warband's results
   data.warbands.forEach(wb => {
-    const { warband_id, xp_earned, gold_earned, soldiers_killed,
-            soldiers_recovering, items_found, injuries } = wb;
+    const { warband_id, xp_earned, gold_earned,
+            soldiers_killed, soldiers_recovering,
+            items_found, injuries,
+            oog_items, stat_improvement, spell_improvement,
+            soldiers_hired, items_purchased, items_sold } = wb;
 
-    // XP transaction
-    if (xp_earned && xp_earned > 0) {
-      appendTransaction(txnSheet, warband_id, game_id, 'treasure',
+    // XP
+    if (xp_earned > 0) {
+      appendTransaction(txnSheet, warband_id, game_id, 'xp',
         'XP from game: ' + data.scenario, 0, xp_earned, timestamp);
       updateWarbandXP(wbSheet, warband_id, xp_earned);
     }
 
-    // Gold transaction
-    if (gold_earned && gold_earned > 0) {
+    // Gold from treasure
+    if (gold_earned > 0) {
       appendTransaction(txnSheet, warband_id, game_id, 'treasure',
         'Gold from game: ' + data.scenario, gold_earned, 0, timestamp);
       updateWarbandGold(wbSheet, warband_id, gold_earned);
     }
 
-    // Soldier deaths (triggers item loss automatically)
+    // Soldier deaths
     if (soldiers_killed && soldiers_killed.length > 0) {
       soldiers_killed.forEach(soldier_id => {
         killSoldier(soldier_id, ss);
-        appendTransaction(txnSheet, warband_id, game_id, 'item_lost',
+        appendTransaction(txnSheet, warband_id, game_id, 'soldier_killed',
           'Soldier killed: ' + soldier_id, 0, 0, timestamp);
       });
     }
 
     // Soldiers recovering
     if (soldiers_recovering && soldiers_recovering.length > 0) {
-      soldiers_recovering.forEach(soldier_id => {
-        setRecovering(soldier_id, ss);
-      });
+      soldiers_recovering.forEach(soldier_id => setRecovering(soldier_id, ss));
     }
 
-    // Items found
+    // Items found (treasure)
     if (items_found && items_found.length > 0) {
       items_found.forEach(item => {
         const item_id = generateId('ITM', itemSheet);
-        itemSheet.appendRow([
-          item_id,
-          warband_id,
-          item.item_type,
-          item.item_name,
-          item.description || '',
-          'active',
-          item.carried_by || ''
-        ]);
+        itemSheet.appendRow([item_id, warband_id, item.item_type, item.item_name,
+                             item.description || '', 'active', item.carried_by || '']);
         appendTransaction(txnSheet, warband_id, game_id, 'item_found',
           'Found: ' + item.item_name, 0, 0, timestamp);
       });
     }
 
-    // Permanent injuries
+    // Permanent injuries (wizard / apprentice / soldiers)
     if (injuries && injuries.length > 0) {
       injuries.forEach(injury => {
         const injury_id = generateId('INJ', injSheet);
-        injSheet.appendRow([
-          injury_id,
-          warband_id,
-          game_id,
-          injury.target_type,
-          injury.target_name,
-          injury.injury_description
-        ]);
+        injSheet.appendRow([injury_id, warband_id, game_id,
+                            injury.target_type, injury.target_name, injury.injury_description]);
+      });
+    }
+
+    // OOG spell items created
+    if (oog_items && oog_items.length > 0) {
+      oog_items.forEach(item => {
+        const item_id = generateId('ITM', itemSheet);
+        itemSheet.appendRow([item_id, warband_id, item.item_type, item.item_name,
+                             'Created via out-of-game spell', 'active', '']);
+        appendTransaction(txnSheet, warband_id, game_id, 'item_found',
+          'OOG spell: ' + item.item_name, 0, 0, timestamp);
+      });
+    }
+
+    // Level-up: stat improvement
+    if (stat_improvement && stat_improvement.stat) {
+      updateWarbandStat(wbSheet, warband_id, stat_improvement.stat, stat_improvement.delta);
+    }
+
+    // Level-up: spell improvement
+    if (spell_improvement && spell_improvement.spell_id) {
+      updateSpellCN(spell_improvement.spell_id, spell_improvement.new_cn, ss);
+    }
+
+    // Soldiers hired
+    if (soldiers_hired && soldiers_hired.length > 0) {
+      soldiers_hired.forEach(s => {
+        addSoldier({ warband_id, soldier_name: s.soldier_name, soldier_type: s.soldier_type }, ss);
+        if (s.cost > 0) {
+          appendTransaction(txnSheet, warband_id, game_id, 'hire',
+            'Hired: ' + s.soldier_name + ' (' + s.soldier_type + ')', -s.cost, 0, timestamp);
+          updateWarbandGold(wbSheet, warband_id, -s.cost);
+        }
+      });
+    }
+
+    // Items purchased
+    if (items_purchased && items_purchased.length > 0) {
+      items_purchased.forEach(item => {
+        const item_id = generateId('ITM', itemSheet);
+        itemSheet.appendRow([item_id, warband_id, item.item_type, item.item_name,
+                             'Purchased', 'active', '']);
+        if (item.cost > 0) {
+          appendTransaction(txnSheet, warband_id, game_id, 'purchase',
+            'Purchased: ' + item.item_name, -item.cost, 0, timestamp);
+          updateWarbandGold(wbSheet, warband_id, -item.cost);
+        }
+      });
+    }
+
+    // Items sold
+    if (items_sold && items_sold.length > 0) {
+      items_sold.forEach(sale => {
+        markItemSold(sale.item_id, ss);
+        if (sale.gold_gained > 0) {
+          appendTransaction(txnSheet, warband_id, game_id, 'sale',
+            'Sold item', sale.gold_gained, 0, timestamp);
+          updateWarbandGold(wbSheet, warband_id, sale.gold_gained);
+        }
       });
     }
   });
@@ -318,14 +369,18 @@ function submitGame(data) {
 // =============================================================================
 
 function updateWarbandXP(wbSheet, warband_id, xp_delta) {
+  // Frostgrave 2e level thresholds
+  const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
   const data = wbSheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     if (data[i][0] === warband_id) {
-      const currentXP = data[i][6] || 0; // column 7 = xp
-      wbSheet.getRange(i + 1, 7).setValue(currentXP + xp_delta);
-      // Auto-level: every 100 XP = 1 level (standard Frostgrave)
-      const newLevel = Math.floor((currentXP + xp_delta) / 100);
-      wbSheet.getRange(i + 1, 6).setValue(newLevel); // column 6 = level
+      const newXP = (Number(data[i][6]) || 0) + xp_delta;
+      let newLevel = 1;
+      for (let l = LEVEL_XP.length - 1; l >= 0; l--) {
+        if (newXP >= LEVEL_XP[l]) { newLevel = l + 1; break; }
+      }
+      wbSheet.getRange(i + 1, 7).setValue(newXP);    // col 7 = xp
+      wbSheet.getRange(i + 1, 6).setValue(newLevel); // col 6 = level
       break;
     }
   }
@@ -335,8 +390,35 @@ function updateWarbandGold(wbSheet, warband_id, gold_delta) {
   const data = wbSheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     if (data[i][0] === warband_id) {
-      const currentGold = data[i][15] || 0; // column 16 = gold
-      wbSheet.getRange(i + 1, 16).setValue(currentGold + gold_delta);
+      const current = Number(data[i][15]) || 0; // col 16 = gold
+      wbSheet.getRange(i + 1, 16).setValue(current + gold_delta);
+      break;
+    }
+  }
+}
+
+function updateWarbandStat(wbSheet, warband_id, stat, delta) {
+  // WARBANDS columns (1-indexed): move=8, fight=9, shoot=10, armour=11, will=12, health=13
+  const colMap = { move: 8, fight: 9, shoot: 10, armour: 11, will: 12, health: 13 };
+  const col = colMap[stat];
+  if (!col) return;
+  const data = wbSheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === warband_id) {
+      const current = Number(data[i][col - 1]) || 0;
+      wbSheet.getRange(i + 1, col).setValue(current + delta);
+      break;
+    }
+  }
+}
+
+function markItemSold(item_id, ss) {
+  ss = ss || SpreadsheetApp.openById(SHEET_ID);
+  const itemSheet = ss.getSheetByName('ITEMS');
+  const data = itemSheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === item_id) {
+      itemSheet.getRange(i + 1, 6).setValue('sold'); // col 6 = status
       break;
     }
   }
@@ -350,39 +432,32 @@ function updateWarbandGold(wbSheet, warband_id, gold_delta) {
 function appendTransaction(txnSheet, warband_id, game_id, type,
                            description, gold_delta, xp_delta, timestamp) {
   const txn_id = generateId('TXN', txnSheet);
-  txnSheet.appendRow([
-    txn_id,
-    warband_id,
-    game_id,
-    type,
-    description,
-    gold_delta,
-    xp_delta,
-    timestamp
-  ]);
+  txnSheet.appendRow([txn_id, warband_id, game_id, type,
+                      description, gold_delta, xp_delta, timestamp]);
 }
 
 
 // =============================================================================
-// READ FUNCTIONS (for dashboard / GET requests)
+// READ FUNCTIONS
 // =============================================================================
 
 function getWarbands() {
-  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const ss      = SpreadsheetApp.openById(SHEET_ID);
   const wbSheet  = ss.getSheetByName('WARBANDS');
   const solSheet = ss.getSheetByName('SOLDIERS');
   const spSheet  = ss.getSheetByName('SPELLS');
+  const itemSheet = ss.getSheetByName('ITEMS');
 
-  const wbData  = sheetToObjects(wbSheet);
-  const solData = sheetToObjects(solSheet);
-  const spData  = sheetToObjects(spSheet);
+  const wbData   = sheetToObjects(wbSheet);
+  const solData  = sheetToObjects(solSheet);
+  const spData   = sheetToObjects(spSheet);
+  const itemData = sheetToObjects(itemSheet);
 
-  // Attach soldiers and spells to each warband
   const warbands = wbData.map(wb => {
     const soldiers = solData.filter(s => s.warband_id === wb.warband_id);
     const spells   = spData.filter(s => s.warband_id === wb.warband_id);
+    const items    = itemData.filter(i => i.warband_id === wb.warband_id);
 
-    // Derive apprentice stats
     wb.apprentice_fight  = wb.fight  - 2;
     wb.apprentice_will   = wb.will   - 2;
     wb.apprentice_health = wb.health - 2;
@@ -390,7 +465,7 @@ function getWarbands() {
     wb.apprentice_shoot  = wb.shoot;
     wb.apprentice_armour = wb.armour;
 
-    return { ...wb, soldiers, spells };
+    return { ...wb, soldiers, spells, items };
   });
 
   return { success: true, warbands };
@@ -413,7 +488,7 @@ function getGames() {
 
 
 // =============================================================================
-// UTILITY: Convert sheet rows to array of objects using header row
+// UTILITY
 // =============================================================================
 
 function sheetToObjects(sheet) {

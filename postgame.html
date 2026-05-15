@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Frostgrave — Post-Game Report</title>
+  <title>Frostgrave — After-Action Report</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
 
@@ -76,6 +76,19 @@
       border-bottom: 1px solid var(--border);
     }
 
+    .phase-header {
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      margin: 1.6rem 0 0.9rem;
+      padding: 0.45rem 0.8rem;
+      border-left: 2px solid var(--gold);
+      background: rgba(201,168,76,0.06);
+    }
+
     .field { margin-bottom: 1.1rem; }
 
     label {
@@ -102,13 +115,17 @@
 
     input:focus, select:focus, textarea:focus { border-color: var(--frost); }
     select option { background: var(--deep); }
+    input[readonly] { color: var(--muted); cursor: default; }
 
-    /* Player count selector */
-    .player-count-btns {
-      display: flex;
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 0.8rem;
-      margin-top: 0.5rem;
     }
+
+    .two-col .field { margin-bottom: 0; }
+
+    .player-count-btns { display: flex; gap: 0.8rem; margin-top: 0.5rem; }
 
     .pc-btn {
       flex: 1;
@@ -126,55 +143,72 @@
     }
 
     .pc-btn:hover { border-color: var(--frost); color: var(--frost); }
+    .pc-btn.active { background: rgba(122,179,200,0.12); border-color: var(--frost); color: var(--ice); }
 
-    .pc-btn.active {
-      background: rgba(122,179,200,0.12);
-      border-color: var(--frost);
-      color: var(--ice);
-    }
-
-    /* Warband blocks */
-    .warband-block {
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      margin-bottom: 1.4rem;
-      overflow: hidden;
-    }
-
-    .warband-header {
-      background: rgba(122,179,200,0.07);
-      border-bottom: 1px solid var(--border);
+    .subsection-label {
       font-family: 'Cinzel', serif;
-      font-size: 0.95rem;
-      color: var(--frost);
-      letter-spacing: 0.08em;
-      padding: 0.8rem 1.2rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin: 1rem 0 0.5rem;
     }
 
-    .warband-body { padding: 1.2rem; }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-    }
-
-    .two-col .field { margin-bottom: 0; }
-
-    /* Soldier casualty rows */
-    .casualty-list { margin-top: 0.5rem; }
-
-    .casualty-row {
-      display: grid;
-      grid-template-columns: 2fr 1fr auto;
-      gap: 0.6rem;
+    /* OOA toggles */
+    .ooa-toggle-row {
+      display: flex;
       align-items: center;
-      margin-bottom: 0.5rem;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(46,74,90,0.5);
     }
 
-    .casualty-row select, .casualty-row input { margin-bottom: 0; }
+    .ooa-label { font-size: 0.95rem; color: var(--text); }
 
-    .btn-remove-small {
+    .toggle-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      padding: 0.25rem 0.8rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(0,0,0,0.3);
+      color: var(--muted);
+      min-width: 56px;
+    }
+
+    .toggle-btn.active {
+      background: rgba(139,58,58,0.2);
+      border-color: var(--danger);
+      color: #c08080;
+    }
+
+    .ooa-detail {
+      margin: 0.5rem 0 0.8rem 0;
+      padding: 0.8rem;
+      background: rgba(139,58,58,0.07);
+      border: 1px solid rgba(139,58,58,0.2);
+      border-radius: 3px;
+    }
+
+    .ooa-detail select, .ooa-detail input { margin-bottom: 0; }
+
+    /* Dynamic rows */
+    .dyn-row {
+      display: grid;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.45rem;
+    }
+
+    .dyn-row-3 { grid-template-columns: 2fr 1.2fr auto; }
+    .dyn-row-2 { grid-template-columns: 1fr auto; }
+    .dyn-row-item { grid-template-columns: 1fr 1.6fr auto; }
+    .dyn-row-sell { grid-template-columns: 2fr 0.8fr auto; }
+
+    .btn-remove {
       background: none;
       border: 1px solid var(--danger);
       border-radius: 3px;
@@ -186,9 +220,9 @@
       white-space: nowrap;
     }
 
-    .btn-remove-small:hover { background: var(--danger); color: white; }
+    .btn-remove:hover { background: var(--danger); color: white; }
 
-    .btn-add-small {
+    .btn-add {
       background: none;
       border: 1px dashed var(--border);
       border-radius: 3px;
@@ -202,34 +236,59 @@
       margin-top: 0.3rem;
     }
 
-    .btn-add-small:hover { border-color: var(--frost); color: var(--frost); }
+    .btn-add:hover { border-color: var(--frost); color: var(--frost); }
 
-    /* Items found */
-    .item-row {
+    /* Gold bar */
+    .gold-bar {
+      background: rgba(201,168,76,0.07);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 3px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
       display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: 0.6rem;
-      align-items: center;
-      margin-bottom: 0.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.4rem 1rem;
     }
 
-    /* Injuries */
-    .injury-row {
-      display: grid;
-      grid-template-columns: 1fr 2fr auto;
-      gap: 0.6rem;
-      align-items: center;
-      margin-bottom: 0.5rem;
-    }
-
-    .subsection-label {
-      font-family: 'Cinzel', serif;
-      font-size: 0.78rem;
+    .gold-bar-item {
+      font-size: 0.88rem;
       color: var(--muted);
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      margin: 1rem 0 0.5rem;
     }
+
+    .gold-bar-item b { color: var(--gold); }
+
+    .gold-bar-item.remaining { color: var(--ice); }
+    .gold-bar-item.remaining b { color: var(--ice); font-size: 1.05rem; }
+    .gold-bar-item.negative b { color: #c08080; }
+
+    /* Level-up highlight */
+    .levelup-box {
+      background: rgba(201,168,76,0.08);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 3px;
+      padding: 0.9rem 1rem;
+      margin-top: 0.6rem;
+    }
+
+    .levelup-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.6rem;
+    }
+
+    /* OOG item toggle */
+    .oog-item-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-top: 0.4rem;
+    }
+
+    .oog-item-toggle-label { font-size: 0.88rem; color: var(--muted); }
+
+    .oog-item-fields { margin-top: 0.5rem; }
 
     /* Submit */
     .btn-submit {
@@ -265,23 +324,10 @@
       display: none;
     }
 
-    .status-msg.success {
-      background: rgba(50,120,80,0.2);
-      border: 1px solid #3a7a50;
-      color: #7acca0;
-      display: block;
-    }
+    .status-msg.success { background: rgba(50,120,80,0.2); border: 1px solid #3a7a50; color: #7acca0; display: block; }
+    .status-msg.error { background: rgba(139,58,58,0.2); border: 1px solid var(--danger); color: #c08080; display: block; }
 
-    .status-msg.error {
-      background: rgba(139,58,58,0.2);
-      border: 1px solid var(--danger);
-      color: #c08080;
-      display: block;
-    }
-
-    #warband-sections { margin-top: 1rem; }
-
-    .hidden { display: none; }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -292,7 +338,7 @@
     <p>Record what happened in the ruins — together, while it's fresh</p>
   </header>
 
-  <!-- GAME INFO -->
+  <!-- GAME DETAILS -->
   <div class="section">
     <div class="section-title">Game Details</div>
     <div class="two-col">
@@ -336,58 +382,82 @@
       <label>Notes (optional)</label>
       <textarea id="game_notes" rows="2" placeholder="Memorable moments, house rules used, etc."></textarea>
     </div>
-
     <div class="field">
       <label>Number of Warbands</label>
       <div class="player-count-btns">
         <button class="pc-btn" onclick="setPlayerCount(2)">2</button>
         <button class="pc-btn" onclick="setPlayerCount(3)">3</button>
         <button class="pc-btn" onclick="setPlayerCount(4)">4</button>
+        <button class="pc-btn" onclick="setPlayerCount(5)">5</button>
+        <button class="pc-btn" onclick="setPlayerCount(6)">6</button>
+        <button class="pc-btn" onclick="setPlayerCount(7)">7</button>
+        <button class="pc-btn" onclick="setPlayerCount(8)">8</button>
       </div>
     </div>
   </div>
 
-  <!-- DYNAMIC WARBAND SECTIONS -->
   <div id="warband-sections"></div>
 
-  <!-- SUBMIT (hidden until player count chosen) -->
   <div class="section hidden" id="submit-section">
     <div class="section-title">Commit the Record</div>
-    <button class="btn-submit" id="submit-btn" onclick="submitGame()">
-      Submit After-Action Report
-    </button>
+    <button class="btn-submit" id="submit-btn" onclick="submitGame()">Submit After-Action Report</button>
     <div class="status-msg" id="status-msg"></div>
   </div>
 
 </div>
-
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzEkMwSlrePHPepnP5HqX0KkajHyDscq-Orex1H02u3OVBLBPIo6_UesNnPxle03BcM/exec';
 
-  // Set today's date as default
+  const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
+
+  const SOLDIER_TYPES = [
+    { name: 'Apothecary', cost: 75 },
+    { name: 'Archer', cost: 75 },
+    { name: 'Barbarian', cost: 125 },
+    { name: 'Crossbowman', cost: 75 },
+    { name: 'Infantryman', cost: 50 },
+    { name: 'Knight', cost: 125 },
+    { name: 'Man-at-Arms', cost: 75 },
+    { name: 'Marksman', cost: 125 },
+    { name: 'Ranger', cost: 125 },
+    { name: 'Templar', cost: 125 },
+    { name: 'Thief', cost: 0 },
+    { name: 'Thug', cost: 0 },
+    { name: 'Tracker', cost: 100 },
+    { name: 'Treasure Hunter', cost: 100 },
+    { name: 'War Hound', cost: 10 },
+  ];
+
+  const ITEM_TYPES = ['potion','scroll','grimoire','magic_weapon','magic_armour','magic_item'];
+  const ITEM_TYPE_LABELS = {
+    potion: 'Potion', scroll: 'Scroll', grimoire: 'Grimoire',
+    magic_weapon: 'Magic Weapon', magic_armour: 'Magic Armour', magic_item: 'Magic Item'
+  };
+
   document.getElementById('game_date').value = new Date().toISOString().split('T')[0];
 
   let playerCount = 0;
-  let warbandData = []; // loaded from sheet
-  let soldierData = []; // loaded from sheet
+  let warbandData = [];
+  let counters = { cas: 0, item: 0, hired: 0, purch: 0, sold: 0 };
+  let ooaState = {}; // 'wiz_N': bool, 'app_N': bool
+  let oogItemState = {}; // 'wiz_N': bool, 'app_N': bool
 
-  // Load warband data from Apps Script on page load
   async function loadWarbands() {
     try {
       const res = await fetch(APPS_SCRIPT_URL + '?action=getWarbands');
       const data = await res.json();
-      if (data.success) {
-        warbandData = data.warbands.filter(w => w.status === 'active');
-        soldierData = warbandData.flatMap(w =>
-          (w.soldiers || []).filter(s => s.status === 'active' || s.status === 'recovering')
-        );
-      }
-    } catch (e) {
-      console.warn('Could not load warband data:', e);
-    }
+      if (data.success) warbandData = data.warbands.filter(w => w.status === 'active');
+    } catch (e) { console.warn('Could not load warbands:', e); }
   }
 
   loadWarbands();
+
+  function xpLevel(xp) {
+    for (let i = LEVEL_XP.length - 1; i >= 0; i--) {
+      if (xp >= LEVEL_XP[i]) return i + 1;
+    }
+    return 1;
+  }
 
   function setPlayerCount(n) {
     playerCount = n;
@@ -398,224 +468,588 @@
   }
 
   function buildWarbandSections(n) {
-    const container = document.getElementById('warband-sections');
-    container.innerHTML = '';
-    for (let i = 1; i <= n; i++) {
-      container.appendChild(buildWarbandBlock(i));
-    }
+    const c = document.getElementById('warband-sections');
+    c.innerHTML = '';
+    for (let i = 1; i <= n; i++) c.appendChild(buildWarbandBlock(i));
   }
 
-  function buildWarbandBlock(index) {
+  function itemTypeOptions() {
+    return ITEM_TYPES.map(t => `<option value="${t}">${ITEM_TYPE_LABELS[t]}</option>`).join('');
+  }
+
+  function soldierTypeOptions() {
+    return SOLDIER_TYPES.map(s => `<option value="${s.name}" data-cost="${s.cost}">${s.name} (${s.cost === 0 ? 'free' : s.cost + ' gc'})</option>`).join('');
+  }
+
+  function wbSelectOptions() {
+    if (!warbandData.length) return '<option value="">No warbands loaded</option>';
+    return warbandData.map(w =>
+      `<option value="${w.warband_id}">${w.wizard_name} (${w.player_name})</option>`
+    ).join('');
+  }
+
+  function buildWarbandBlock(idx) {
     const div = document.createElement('div');
     div.className = 'section';
-    div.id = 'wb-block-' + index;
-
-    // Warband selector options
-    const wbOptions = warbandData.length > 0
-      ? warbandData.map(w =>
-          `<option value="${w.warband_id}">${w.wizard_name} (${w.player_name})</option>`
-        ).join('')
-      : '<option value="">No warbands loaded — enter ID manually</option>';
+    div.id = 'wb-block-' + idx;
 
     div.innerHTML = `
-      <div class="section-title">Warband ${index}</div>
+      <div class="section-title">Warband ${idx}</div>
 
       <div class="field">
         <label>Warband</label>
-        <select id="wb_select_${index}" onchange="onWarbandSelect(${index})">
+        <select id="wb_select_${idx}" onchange="onWarbandSelect(${idx})">
           <option value="">— Select warband —</option>
-          ${wbOptions}
+          ${wbSelectOptions()}
         </select>
       </div>
+
+      <!-- ── PHASE 1: INJURY & DEATH ── -->
+      <div class="phase-header">I. Injury &amp; Death</div>
+
+      <div class="ooa-toggle-row">
+        <span class="ooa-label">Wizard went Out of Action?</span>
+        <button class="toggle-btn" id="wiz_ooa_btn_${idx}" onclick="toggleOOA('wiz',${idx})">No</button>
+      </div>
+      <div class="ooa-detail hidden" id="wiz_ooa_detail_${idx}">
+        <select id="wiz_ooa_out_${idx}" onchange="onOOAOutcome('wiz',${idx})">
+          <option value="fine">Fine — no lasting effect</option>
+          <option value="recovering">Recovering — misses next game</option>
+          <option value="injury">Permanent Injury</option>
+        </select>
+        <input type="text" id="wiz_ooa_inj_${idx}" class="hidden" placeholder="Describe the injury…" style="margin-top:0.4rem">
+      </div>
+
+      <div class="ooa-toggle-row" style="margin-top:0.4rem">
+        <span class="ooa-label">Apprentice went Out of Action?</span>
+        <button class="toggle-btn" id="app_ooa_btn_${idx}" onclick="toggleOOA('app',${idx})">No</button>
+      </div>
+      <div class="ooa-detail hidden" id="app_ooa_detail_${idx}">
+        <select id="app_ooa_out_${idx}" onchange="onOOAOutcome('app',${idx})">
+          <option value="fine">Fine — no lasting effect</option>
+          <option value="recovering">Recovering — misses next game</option>
+          <option value="injury">Permanent Injury</option>
+        </select>
+        <input type="text" id="app_ooa_inj_${idx}" class="hidden" placeholder="Describe the injury…" style="margin-top:0.4rem">
+      </div>
+
+      <div class="subsection-label" style="margin-top:1rem">Soldiers Out of Action</div>
+      <div id="casualties_${idx}"></div>
+      <button class="btn-add" onclick="addCasualty(${idx})">+ Add Soldier OOA</button>
+
+      <!-- ── PHASE 2: OUT OF GAME SPELLS ── -->
+      <div class="phase-header">II. Out of Game Spells</div>
+
+      <div class="field">
+        <label>Wizard casts (optional)</label>
+        <select id="wiz_oog_${idx}">
+          <option value="">— None —</option>
+        </select>
+        <div class="oog-item-toggle-row">
+          <span class="oog-item-toggle-label">Created an item?</span>
+          <button class="toggle-btn" id="wiz_oog_item_btn_${idx}" onclick="toggleOOGItem('wiz',${idx})">No</button>
+        </div>
+        <div class="oog-item-fields hidden" id="wiz_oog_item_${idx}">
+          <div class="two-col" style="margin-top:0.5rem">
+            <select id="wiz_oog_itype_${idx}">${itemTypeOptions()}</select>
+            <input type="text" id="wiz_oog_iname_${idx}" placeholder="Item name / description">
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Apprentice casts (optional)</label>
+        <select id="app_oog_${idx}">
+          <option value="">— None —</option>
+        </select>
+        <div class="oog-item-toggle-row">
+          <span class="oog-item-toggle-label">Created an item?</span>
+          <button class="toggle-btn" id="app_oog_item_btn_${idx}" onclick="toggleOOGItem('app',${idx})">No</button>
+        </div>
+        <div class="oog-item-fields hidden" id="app_oog_item_${idx}">
+          <div class="two-col" style="margin-top:0.5rem">
+            <select id="app_oog_itype_${idx}">${itemTypeOptions()}</select>
+            <input type="text" id="app_oog_iname_${idx}" placeholder="Item name / description">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PHASE 3: EXPERIENCE & LEVEL ── -->
+      <div class="phase-header">III. Experience &amp; Level</div>
+
+      <div class="two-col">
+        <div class="field">
+          <label>XP Earned This Game</label>
+          <input type="number" id="wb_xp_${idx}" min="0" value="0" oninput="updateXPDisplay(${idx})">
+        </div>
+        <div class="field">
+          <label>Projected Total XP</label>
+          <input type="text" id="wb_xp_total_${idx}" readonly placeholder="Select warband first">
+        </div>
+      </div>
+
+      <div id="levelup_box_${idx}" class="levelup-box hidden">
+        <div class="levelup-label">Level Up — choose one improvement:</div>
+        <select id="levelup_type_${idx}" onchange="onLevelupType(${idx})">
+          <option value="">— Select improvement —</option>
+          <option value="fight">+1 Fight</option>
+          <option value="shoot">+1 Shoot</option>
+          <option value="will">+1 Will</option>
+          <option value="health">+1 Health (maximum)</option>
+          <option value="move">+1 Move</option>
+          <option value="armour">-1 Armour number (better defence)</option>
+          <option value="spell">Improve a Spell (−1 Casting Number)</option>
+        </select>
+        <div id="levelup_spell_row_${idx}" class="hidden" style="margin-top:0.6rem">
+          <label>Which spell?</label>
+          <select id="levelup_spell_${idx}">
+            <option value="">— Select spell —</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ── PHASE 4: COUNTING TREASURE ── -->
+      <div class="phase-header">IV. Counting Treasure</div>
 
       <div class="two-col">
         <div class="field">
           <label>Treasure Tokens Collected</label>
-          <input type="number" id="wb_treasure_${index}" min="0" max="10" value="0">
+          <input type="number" id="wb_tokens_${idx}" min="0" value="0">
         </div>
         <div class="field">
-          <label>Gold Earned (from treasure)</label>
-          <input type="number" id="wb_gold_${index}" min="0" value="0">
+          <label>Gold Earned (gc)</label>
+          <input type="number" id="wb_gold_${idx}" min="0" value="0" oninput="updateGoldSummary(${idx})">
         </div>
       </div>
 
-      <div class="field">
-        <label>XP Earned</label>
-        <input type="number" id="wb_xp_${index}" min="0" value="0">
+      <div class="subsection-label">Items Found</div>
+      <div id="items_${idx}"></div>
+      <button class="btn-add" onclick="addItem(${idx})">+ Add Item Found</button>
+
+      <!-- ── PHASE 5: SPEND TREASURE ── -->
+      <div class="phase-header">V. Spend Treasure</div>
+
+      <div class="gold-bar" id="gold_bar_${idx}">
+        <div class="gold-bar-item"><b id="gs_start_${idx}">—</b><br>Starting</div>
+        <div class="gold-bar-item"><b id="gs_earned_${idx}">+0</b><br>Earned</div>
+        <div class="gold-bar-item"><b id="gs_sold_${idx}">+0</b><br>Sold</div>
+        <div class="gold-bar-item"><b id="gs_spent_${idx}">−0</b><br>Spent</div>
+        <div class="gold-bar-item remaining"><b id="gs_remaining_${idx}">—</b><br>Remaining</div>
       </div>
 
-      <!-- SOLDIER CASUALTIES -->
-      <div class="subsection-label">Soldier Casualties</div>
-      <div class="casualty-list" id="casualties_${index}"></div>
-      <button class="btn-add-small" onclick="addCasualty(${index})">+ Add Casualty</button>
+      <div class="subsection-label">Hire Soldiers</div>
+      <div id="hired_${idx}"></div>
+      <button class="btn-add" onclick="addHired(${idx})">+ Hire Soldier</button>
 
-      <!-- ITEMS FOUND -->
-      <div class="subsection-label">Items Found</div>
-      <div id="items_${index}"></div>
-      <button class="btn-add-small" onclick="addItem(${index})">+ Add Item</button>
+      <div class="subsection-label">Purchase Items</div>
+      <div id="purchased_${idx}"></div>
+      <button class="btn-add" onclick="addPurchase(${idx})">+ Purchase Item</button>
 
-      <!-- PERMANENT INJURIES -->
-      <div class="subsection-label">Permanent Injuries (Wizard / Apprentice)</div>
-      <div id="injuries_${index}"></div>
-      <button class="btn-add-small" onclick="addInjury(${index})">+ Add Injury</button>
+      <div class="subsection-label">Sell Items</div>
+      <div id="sold_${idx}"></div>
+      <button class="btn-add" onclick="addSale(${idx})">+ Sell Item</button>
     `;
 
     return div;
   }
 
-  function onWarbandSelect(index) {
-    // Could pre-populate soldier dropdowns based on selected warband
-    // For now just clears existing casualties
-    document.getElementById('casualties_' + index).innerHTML = '';
-  }
+  // ── WARBAND SELECTION ──────────────────────────────────────────────
 
-  function getSoldiersForWarband(wbIndex) {
-    const wbId = document.getElementById('wb_select_' + wbIndex).value;
+  function onWarbandSelect(idx) {
+    const wbId = document.getElementById('wb_select_' + idx).value;
     const wb = warbandData.find(w => w.warband_id === wbId);
-    return wb ? (wb.soldiers || []).filter(s => s.status !== 'dead') : [];
+
+    // Reset casualty list
+    document.getElementById('casualties_' + idx).innerHTML = '';
+
+    // Populate spell dropdowns (OOG + level-up)
+    const spells = wb ? (wb.spells || []) : [];
+    const spellOpts = spells.map(s =>
+      `<option value="${s.spell_id}|${s.casting_number}">${s.spell_name} (CN ${s.casting_number})</option>`
+    ).join('');
+
+    ['wiz_oog_', 'app_oog_'].forEach(prefix => {
+      const sel = document.getElementById(prefix + idx);
+      sel.innerHTML = '<option value="">— None —</option>' + spells.map(s =>
+        `<option value="${s.spell_id}">${s.spell_name}</option>`
+      ).join('');
+    });
+
+    const luSpell = document.getElementById('levelup_spell_' + idx);
+    luSpell.innerHTML = '<option value="">— Select spell —</option>' + spells.map(s =>
+      `<option value="${s.spell_id}|${s.casting_number}">${s.spell_name} (current CN: ${s.casting_number})</option>`
+    ).join('');
+
+    // Populate sell items dropdown
+    const items = wb ? (wb.items || []).filter(i => i.status === 'active') : [];
+    // items will be added dynamically when addSale is called
+    document.getElementById('sold_' + idx).innerHTML = '';
+
+    // Update XP display
+    if (wb) {
+      document.getElementById('wb_xp_total_' + idx).placeholder = '';
+      updateXPDisplay(idx);
+    }
+
+    updateGoldSummary(idx);
   }
 
-  // ---- CASUALTIES ----
-  let casualtyCount = 0;
+  // ── PHASE 1 HELPERS ───────────────────────────────────────────────
 
-  function addCasualty(wbIndex) {
-    casualtyCount++;
-    const id = `cas_${wbIndex}_${casualtyCount}`;
-    const soldiers = getSoldiersForWarband(wbIndex);
-    const solOptions = soldiers.length > 0
-      ? soldiers.map(s =>
-          `<option value="${s.soldier_id}">${s.soldier_name} (${s.soldier_type})</option>`
-        ).join('')
-      : '<option value="">Enter soldier ID manually</option>';
+  function toggleOOA(type, idx) {
+    const key = type + '_' + idx;
+    ooaState[key] = !ooaState[key];
+    const btn = document.getElementById(type + '_ooa_btn_' + idx);
+    const detail = document.getElementById(type + '_ooa_detail_' + idx);
+    if (ooaState[key]) {
+      btn.textContent = 'Yes';
+      btn.classList.add('active');
+      detail.classList.remove('hidden');
+    } else {
+      btn.textContent = 'No';
+      btn.classList.remove('active');
+      detail.classList.add('hidden');
+    }
+  }
+
+  function onOOAOutcome(type, idx) {
+    const val = document.getElementById(type + '_ooa_out_' + idx).value;
+    const injField = document.getElementById(type + '_ooa_inj_' + idx);
+    if (val === 'injury') injField.classList.remove('hidden');
+    else injField.classList.add('hidden');
+  }
+
+  function addCasualty(wbIdx) {
+    counters.cas++;
+    const id = `cas_${wbIdx}_${counters.cas}`;
+    const wb = warbandData.find(w => w.warband_id === document.getElementById('wb_select_' + wbIdx).value);
+    const soldiers = wb ? (wb.soldiers || []).filter(s => s.status !== 'dead') : [];
+    const solOpts = soldiers.length
+      ? soldiers.map(s => `<option value="${s.soldier_id}">${s.soldier_name} (${s.soldier_type})</option>`).join('')
+      : '<option value="">— no soldiers loaded —</option>';
 
     const div = document.createElement('div');
-    div.className = 'casualty-row';
+    div.className = 'dyn-row dyn-row-3';
     div.id = id;
     div.innerHTML = `
-      <select name="cas_soldier_${id}">
+      <select name="cas_sol_${id}">
         <option value="">— Soldier —</option>
-        ${solOptions}
+        ${solOpts}
       </select>
-      <select name="cas_result_${id}">
+      <select name="cas_res_${id}">
         <option value="dead">Killed</option>
-        <option value="recovering">Recovering (miss next game)</option>
+        <option value="recovering">Recovering</option>
+        <option value="fine">Unharmed</option>
       </select>
-      <button class="btn-remove-small" onclick="document.getElementById('${id}').remove()">✕</button>
+      <button class="btn-remove" onclick="document.getElementById('${id}').remove()">✕</button>
     `;
-    document.getElementById('casualties_' + wbIndex).appendChild(div);
+    document.getElementById('casualties_' + wbIdx).appendChild(div);
   }
 
-  // ---- ITEMS ----
-  let itemCount = 0;
+  // ── PHASE 2 HELPERS ───────────────────────────────────────────────
 
-  function addItem(wbIndex) {
-    itemCount++;
-    const id = `itm_${wbIndex}_${itemCount}`;
+  function toggleOOGItem(type, idx) {
+    const key = type + '_' + idx;
+    oogItemState[key] = !oogItemState[key];
+    const btn = document.getElementById(type + '_oog_item_btn_' + idx);
+    const fields = document.getElementById(type + '_oog_item_' + idx);
+    if (oogItemState[key]) {
+      btn.textContent = 'Yes';
+      btn.classList.add('active');
+      fields.classList.remove('hidden');
+    } else {
+      btn.textContent = 'No';
+      btn.classList.remove('active');
+      fields.classList.add('hidden');
+    }
+  }
+
+  // ── PHASE 3 HELPERS ───────────────────────────────────────────────
+
+  function updateXPDisplay(idx) {
+    const wbId = document.getElementById('wb_select_' + idx).value;
+    const wb = warbandData.find(w => w.warband_id === wbId);
+    if (!wb) return;
+
+    const currentXP = parseInt(wb.xp) || 0;
+    const earned = parseInt(document.getElementById('wb_xp_' + idx).value) || 0;
+    const newXP = currentXP + earned;
+    const oldLevel = xpLevel(currentXP);
+    const newLevel = xpLevel(newXP);
+
+    document.getElementById('wb_xp_total_' + idx).value =
+      `${newXP} XP (Level ${newLevel})`;
+
+    const box = document.getElementById('levelup_box_' + idx);
+    if (newLevel > oldLevel) box.classList.remove('hidden');
+    else box.classList.add('hidden');
+  }
+
+  function onLevelupType(idx) {
+    const val = document.getElementById('levelup_type_' + idx).value;
+    const spellRow = document.getElementById('levelup_spell_row_' + idx);
+    if (val === 'spell') spellRow.classList.remove('hidden');
+    else spellRow.classList.add('hidden');
+  }
+
+  // ── PHASE 4 HELPERS ───────────────────────────────────────────────
+
+  function addItem(wbIdx) {
+    counters.item++;
+    const id = `itm_${wbIdx}_${counters.item}`;
     const div = document.createElement('div');
-    div.className = 'item-row';
+    div.className = 'dyn-row dyn-row-item';
     div.id = id;
     div.innerHTML = `
-      <select name="item_type_${id}">
-        <option value="potion">Potion</option>
-        <option value="scroll">Scroll</option>
-        <option value="grimoire">Grimoire</option>
-        <option value="magic_weapon">Magic Weapon</option>
-        <option value="magic_armour">Magic Armour</option>
-        <option value="magic_item">Magic Item</option>
-      </select>
-      <input type="text" name="item_name_${id}" placeholder="Name / description">
-      <button class="btn-remove-small" onclick="document.getElementById('${id}').remove()">✕</button>
+      <select name="itype_${id}">${itemTypeOptions()}</select>
+      <input type="text" name="iname_${id}" placeholder="Name / description">
+      <button class="btn-remove" onclick="document.getElementById('${id}').remove()">✕</button>
     `;
-    document.getElementById('items_' + wbIndex).appendChild(div);
+    document.getElementById('items_' + wbIdx).appendChild(div);
   }
 
-  // ---- INJURIES ----
-  let injuryCount = 0;
+  // ── PHASE 5 HELPERS ───────────────────────────────────────────────
 
-  function addInjury(wbIndex) {
-    injuryCount++;
-    const id = `inj_${wbIndex}_${injuryCount}`;
+  function addHired(wbIdx) {
+    counters.hired++;
+    const id = `hrd_${wbIdx}_${counters.hired}`;
     const div = document.createElement('div');
-    div.className = 'injury-row';
+    div.className = 'dyn-row dyn-row-3';
     div.id = id;
     div.innerHTML = `
-      <select name="inj_target_${id}">
-        <option value="wizard">Wizard</option>
-        <option value="apprentice">Apprentice</option>
+      <input type="text" name="hrd_name_${id}" placeholder="Soldier name">
+      <select name="hrd_type_${id}" onchange="updateGoldSummary(${wbIdx})">
+        ${soldierTypeOptions()}
       </select>
-      <input type="text" name="inj_desc_${id}" placeholder="Describe the permanent injury">
-      <button class="btn-remove-small" onclick="document.getElementById('${id}').remove()">✕</button>
+      <button class="btn-remove" onclick="document.getElementById('${id}').remove();updateGoldSummary(${wbIdx})">✕</button>
     `;
-    document.getElementById('injuries_' + wbIndex).appendChild(div);
+    document.getElementById('hired_' + wbIdx).appendChild(div);
+    updateGoldSummary(wbIdx);
   }
 
-  // ---- COLLECT WARBAND DATA ----
+  function addPurchase(wbIdx) {
+    counters.purch++;
+    const id = `pur_${wbIdx}_${counters.purch}`;
+    const div = document.createElement('div');
+    div.className = 'dyn-row';
+    div.id = id;
+    div.style.gridTemplateColumns = '1fr 1.4fr 0.6fr auto';
+    div.innerHTML = `
+      <select name="pur_type_${id}">${itemTypeOptions()}</select>
+      <input type="text" name="pur_name_${id}" placeholder="Item name">
+      <input type="number" name="pur_cost_${id}" placeholder="Cost" min="0" oninput="updateGoldSummary(${wbIdx})">
+      <button class="btn-remove" onclick="document.getElementById('${id}').remove();updateGoldSummary(${wbIdx})">✕</button>
+    `;
+    document.getElementById('purchased_' + wbIdx).appendChild(div);
+  }
+
+  function addSale(wbIdx) {
+    counters.sold++;
+    const id = `sld_${wbIdx}_${counters.sold}`;
+    const wbId = document.getElementById('wb_select_' + wbIdx).value;
+    const wb = warbandData.find(w => w.warband_id === wbId);
+    const items = wb ? (wb.items || []).filter(i => i.status === 'active') : [];
+    const itemOpts = items.length
+      ? items.map(i => `<option value="${i.item_id}">${i.item_name} (${ITEM_TYPE_LABELS[i.item_type] || i.item_type})</option>`).join('')
+      : '<option value="">— no items in inventory —</option>';
+
+    const div = document.createElement('div');
+    div.className = 'dyn-row dyn-row-sell';
+    div.id = id;
+    div.innerHTML = `
+      <select name="sld_item_${id}">
+        <option value="">— Item —</option>
+        ${itemOpts}
+      </select>
+      <input type="number" name="sld_gold_${id}" placeholder="Gold received" min="0" oninput="updateGoldSummary(${wbIdx})">
+      <button class="btn-remove" onclick="document.getElementById('${id}').remove();updateGoldSummary(${wbIdx})">✕</button>
+    `;
+    document.getElementById('sold_' + wbIdx).appendChild(div);
+  }
+
+  function updateGoldSummary(idx) {
+    const wbId = document.getElementById('wb_select_' + idx).value;
+    const wb = warbandData.find(w => w.warband_id === wbId);
+    const startGold = wb ? (parseInt(wb.gold) || 0) : null;
+    const earned = parseInt(document.getElementById('wb_gold_' + idx).value) || 0;
+
+    let spent = 0;
+    document.querySelectorAll(`#hired_${idx} .dyn-row`).forEach(row => {
+      const sel = row.querySelector('[name^="hrd_type_"]');
+      if (sel) {
+        const opt = sel.options[sel.selectedIndex];
+        spent += parseInt(opt?.dataset.cost || 0);
+      }
+    });
+    document.querySelectorAll(`#purchased_${idx} .dyn-row`).forEach(row => {
+      const cost = row.querySelector('[name^="pur_cost_"]');
+      spent += parseInt(cost?.value || 0);
+    });
+
+    let soldGold = 0;
+    document.querySelectorAll(`#sold_${idx} .dyn-row`).forEach(row => {
+      const g = row.querySelector('[name^="sld_gold_"]');
+      soldGold += parseInt(g?.value || 0);
+    });
+
+    document.getElementById('gs_start_' + idx).textContent = startGold !== null ? startGold + ' gc' : '—';
+    document.getElementById('gs_earned_' + idx).textContent = '+' + earned + ' gc';
+    document.getElementById('gs_sold_' + idx).textContent = '+' + soldGold + ' gc';
+    document.getElementById('gs_spent_' + idx).textContent = '−' + spent + ' gc';
+
+    if (startGold !== null) {
+      const remaining = startGold + earned + soldGold - spent;
+      const el = document.getElementById('gs_remaining_' + idx);
+      el.textContent = remaining + ' gc';
+      el.parentElement.classList.toggle('negative', remaining < 0);
+    } else {
+      document.getElementById('gs_remaining_' + idx).textContent = '—';
+    }
+  }
+
+  // ── COLLECT & SUBMIT ──────────────────────────────────────────────
+
   function collectWarbands() {
-    const warbands = [];
+    const result = [];
     for (let i = 1; i <= playerCount; i++) {
-      const warband_id = document.getElementById('wb_select_' + i).value;
-      if (!warband_id) continue;
+      const wbId = document.getElementById('wb_select_' + i).value;
+      if (!wbId) continue;
+      const wb = warbandData.find(w => w.warband_id === wbId);
 
-      const xp_earned   = parseInt(document.getElementById('wb_xp_' + i).value) || 0;
-      const gold_earned = parseInt(document.getElementById('wb_gold_' + i).value) || 0;
+      // Phase 1 — injuries & deaths
+      const soldiers_killed = [], soldiers_recovering = [], injuries = [];
 
-      // Casualties
-      const soldiers_killed = [];
-      const soldiers_recovering = [];
-      document.querySelectorAll(`#casualties_${i} .casualty-row`).forEach(row => {
-        const id = row.id;
-        const soldierEl = row.querySelector(`[name^="cas_soldier_"]`);
-        const resultEl  = row.querySelector(`[name^="cas_result_"]`);
-        if (soldierEl && soldierEl.value) {
-          if (resultEl.value === 'dead') soldiers_killed.push(soldierEl.value);
-          else soldiers_recovering.push(soldierEl.value);
+      // Wizard OOA
+      if (ooaState['wiz_' + i]) {
+        const out = document.getElementById('wiz_ooa_out_' + i).value;
+        const inj = document.getElementById('wiz_ooa_inj_' + i).value.trim();
+        if (out === 'recovering' || out === 'injury') {
+          injuries.push({
+            target_type: 'wizard',
+            target_name: wb ? wb.wizard_name : 'Wizard',
+            injury_description: out === 'recovering' ? 'Recovering — misses next game' : (inj || 'Permanent injury')
+          });
+        }
+      }
+
+      // Apprentice OOA
+      if (ooaState['app_' + i]) {
+        const out = document.getElementById('app_ooa_out_' + i).value;
+        const inj = document.getElementById('app_ooa_inj_' + i).value.trim();
+        if (out === 'recovering' || out === 'injury') {
+          injuries.push({
+            target_type: 'apprentice',
+            target_name: wb ? wb.apprentice_name : 'Apprentice',
+            injury_description: out === 'recovering' ? 'Recovering — misses next game' : (inj || 'Permanent injury')
+          });
+        }
+      }
+
+      // Soldiers OOA
+      document.querySelectorAll(`#casualties_${i} .dyn-row`).forEach(row => {
+        const sol = row.querySelector('[name^="cas_sol_"]');
+        const res = row.querySelector('[name^="cas_res_"]');
+        if (sol?.value) {
+          if (res.value === 'dead') soldiers_killed.push(sol.value);
+          else if (res.value === 'recovering') soldiers_recovering.push(sol.value);
         }
       });
 
-      // Items
+      // Phase 2 — OOG spells
+      const oog_items = [];
+      ['wiz', 'app'].forEach(type => {
+        if (oogItemState[type + '_' + i]) {
+          const itype = document.getElementById(type + '_oog_itype_' + i).value;
+          const iname = document.getElementById(type + '_oog_iname_' + i).value.trim();
+          if (iname) oog_items.push({ item_type: itype, item_name: iname });
+        }
+      });
+
+      // Phase 3 — XP & level-up
+      const xp_earned = parseInt(document.getElementById('wb_xp_' + i).value) || 0;
+      let stat_improvement = null;
+      let spell_improvement = null;
+
+      const luType = document.getElementById('levelup_type_' + i)?.value;
+      if (luType && luType !== '') {
+        if (luType === 'spell') {
+          const spellVal = document.getElementById('levelup_spell_' + i).value;
+          if (spellVal) {
+            const [spellId, currentCN] = spellVal.split('|');
+            spell_improvement = { spell_id: spellId, new_cn: parseInt(currentCN) - 1 };
+          }
+        } else {
+          const delta = luType === 'armour' ? -1 : 1;
+          stat_improvement = { stat: luType, delta };
+        }
+      }
+
+      // Phase 4 — treasure
+      const gold_earned = parseInt(document.getElementById('wb_gold_' + i).value) || 0;
+      const tokens = parseInt(document.getElementById('wb_tokens_' + i).value) || 0;
       const items_found = [];
-      document.querySelectorAll(`#items_${i} .item-row`).forEach(row => {
-        const id = row.id;
-        const typeEl = row.querySelector(`[name^="item_type_"]`);
-        const nameEl = row.querySelector(`[name^="item_name_"]`);
-        if (nameEl && nameEl.value.trim()) {
-          items_found.push({
-            item_type: typeEl.value,
-            item_name: nameEl.value.trim()
+      document.querySelectorAll(`#items_${i} .dyn-row`).forEach(row => {
+        const itype = row.querySelector('[name^="itype_"]');
+        const iname = row.querySelector('[name^="iname_"]');
+        if (iname?.value.trim()) {
+          items_found.push({ item_type: itype.value, item_name: iname.value.trim() });
+        }
+      });
+
+      // Phase 5 — spend
+      const soldiers_hired = [];
+      document.querySelectorAll(`#hired_${i} .dyn-row`).forEach(row => {
+        const name = row.querySelector('[name^="hrd_name_"]')?.value.trim();
+        const sel  = row.querySelector('[name^="hrd_type_"]');
+        if (name && sel) {
+          const cost = parseInt(sel.options[sel.selectedIndex]?.dataset.cost || 0);
+          soldiers_hired.push({ soldier_name: name, soldier_type: sel.value, cost });
+        }
+      });
+
+      const items_purchased = [];
+      document.querySelectorAll(`#purchased_${i} .dyn-row`).forEach(row => {
+        const itype = row.querySelector('[name^="pur_type_"]');
+        const iname = row.querySelector('[name^="pur_name_"]');
+        const cost  = row.querySelector('[name^="pur_cost_"]');
+        if (iname?.value.trim()) {
+          items_purchased.push({
+            item_type: itype.value,
+            item_name: iname.value.trim(),
+            cost: parseInt(cost?.value || 0)
           });
         }
       });
 
-      // Injuries
-      const injuries = [];
-      const wb = warbandData.find(w => w.warband_id === warband_id);
-      document.querySelectorAll(`#injuries_${i} .injury-row`).forEach(row => {
-        const targetEl = row.querySelector(`[name^="inj_target_"]`);
-        const descEl   = row.querySelector(`[name^="inj_desc_"]`);
-        if (descEl && descEl.value.trim()) {
-          const target_type = targetEl.value;
-          const target_name = target_type === 'wizard'
-            ? (wb ? wb.wizard_name : 'Wizard')
-            : (wb ? wb.apprentice_name : 'Apprentice');
-          injuries.push({ target_type, target_name, injury_description: descEl.value.trim() });
+      const items_sold = [];
+      document.querySelectorAll(`#sold_${i} .dyn-row`).forEach(row => {
+        const item = row.querySelector('[name^="sld_item_"]');
+        const gold = row.querySelector('[name^="sld_gold_"]');
+        if (item?.value) {
+          items_sold.push({ item_id: item.value, gold_gained: parseInt(gold?.value || 0) });
         }
       });
 
-      warbands.push({ warband_id, xp_earned, gold_earned,
-                      soldiers_killed, soldiers_recovering,
-                      items_found, injuries });
+      result.push({
+        warband_id: wbId,
+        xp_earned, gold_earned, tokens,
+        soldiers_killed, soldiers_recovering,
+        items_found, injuries,
+        oog_items,
+        stat_improvement, spell_improvement,
+        soldiers_hired, items_purchased, items_sold
+      });
     }
-    return warbands;
+    return result;
   }
 
-  // ---- SUBMIT ----
   async function submitGame() {
     const btn = document.getElementById('submit-btn');
     const msg = document.getElementById('status-msg');
     msg.className = 'status-msg';
 
-    const date     = document.getElementById('game_date').value;
-    const scenario = document.getElementById('scenario').value;
+    const date       = document.getElementById('game_date').value;
+    const scenario   = document.getElementById('scenario').value;
     const recorded_by = document.getElementById('recorded_by').value.trim();
 
     if (!date || !scenario || !recorded_by) {
@@ -625,28 +1059,24 @@
     }
 
     const warbands = collectWarbands();
-    if (warbands.length === 0) {
+    if (!warbands.length) {
       msg.className = 'status-msg error';
       msg.textContent = 'Please select at least one warband.';
       return;
     }
 
-    const payload = {
-      action: 'submitGame',
-      date,
-      scenario,
-      recorded_by,
-      notes: document.getElementById('game_notes').value.trim(),
-      warbands
-    };
-
     btn.disabled = true;
-    btn.textContent = 'Recording...';
+    btn.textContent = 'Recording…';
 
     try {
       const res = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          action: 'submitGame',
+          date, scenario, recorded_by,
+          notes: document.getElementById('game_notes').value.trim(),
+          warbands
+        })
       });
       const data = await res.json();
       if (data.success) {
