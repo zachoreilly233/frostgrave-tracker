@@ -751,6 +751,13 @@
       return;
     }
 
+    let soldierSpend = 0;
+    document.querySelectorAll('[name^="soldier_type_"]').forEach(sel => {
+      const t = SOLDIER_TYPES.find(s => s.name === sel.value);
+      if (t) soldierSpend += t.cost;
+    });
+    const startingGold = 400 - 100 - soldierSpend; // 400 base − 100 apprentice − soldiers
+
     const payload = {
       action: 'createWarband',
       player_name,
@@ -760,6 +767,7 @@
       move: 6, fight: 2, shoot: 0, armour: 11, will: 4, health: 14,
       apprentice_name,
       apprentice_photo_url: '',
+      gold: startingGold,
       soldiers: collectSoldiers(),
       spells:   collectSpells()
     };

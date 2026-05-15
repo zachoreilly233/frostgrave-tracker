@@ -5,7 +5,7 @@
 // After deploying, paste the Web App URL into your forms' APPS_SCRIPT_URL const.
 // =============================================================================
 
-const SHEET_ID = 'YOUR_GOOGLE_SHEET_ID_HERE'; // Replace after creating your sheet
+const SHEET_ID = '1z0MZE6f86DDtoow0ACa7wlgxEtqxKU-XMBxeWfE8ck4'; // Replace after creating your sheet
 
 function doPost(e) {
   try {
@@ -94,7 +94,7 @@ function createWarband(data) {
     data.health,
     data.apprentice_name,
     data.apprentice_photo_url || '',
-    400,                  // starting gold
+    data.gold !== undefined ? data.gold : 400, // gold remaining after setup
     '',                   // base_notes
     'active'              // status
   ]);
