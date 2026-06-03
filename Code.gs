@@ -249,7 +249,7 @@ function submitGame(data) {
     const { warband_id, xp_earned, gold_earned,
             soldiers_killed, soldiers_recovering,
             items_found, injuries,
-            oog_items, stat_improvement, spell_improvement,
+            stat_improvements, spell_improvements, spells_learned,
             soldiers_hired, items_purchased, items_sold } = wb;
 
     // XP
@@ -300,25 +300,25 @@ function submitGame(data) {
       });
     }
 
-    // OOG spell items created
-    if (oog_items && oog_items.length > 0) {
-      oog_items.forEach(item => {
-        const item_id = generateId('ITM', itemSheet);
-        itemSheet.appendRow([item_id, warband_id, item.item_type, item.item_name,
-                             'Created via out-of-game spell', 'active', '']);
-        appendTransaction(txnSheet, warband_id, game_id, 'item_found',
-          'OOG spell: ' + item.item_name, 0, 0, timestamp);
-      });
+    // Level-up: stat improvements (array, one per level gained)
+    if (stat_improvements && stat_improvements.length > 0) {
+      stat_improvements.forEach(si => updateWarbandStat(wbSheet, warband_id, si.stat, si.delta));
     }
 
-    // Level-up: stat improvement
-    if (stat_improvement && stat_improvement.stat) {
-      updateWarbandStat(wbSheet, warband_id, stat_improvement.stat, stat_improvement.delta);
+    // Level-up: spell casting number improvements
+    if (spell_improvements && spell_improvements.length > 0) {
+      spell_improvements.forEach(si => updateSpellCN(si.spell_id, si.new_cn, ss));
     }
 
-    // Level-up: spell improvement
-    if (spell_improvement && spell_improvement.spell_id) {
-      updateSpellCN(spell_improvement.spell_id, spell_improvement.new_cn, ss);
+    // Level-up: spells learned
+    if (spells_learned && spells_learned.length > 0) {
+      spells_learned.forEach(spell => addSpell({
+        warband_id,
+        spell_name: spell.spell_name,
+        school: spell.school,
+        base_casting_number: spell.base_casting_number,
+        casting_number: spell.casting_number
+      }, ss));
     }
 
     // Soldiers hired

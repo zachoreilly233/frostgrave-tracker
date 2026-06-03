@@ -38,12 +38,7 @@
 
     .container { max-width: 820px; margin: 0 auto; }
 
-    header {
-      text-align: center;
-      margin-bottom: 3rem;
-      padding-bottom: 2rem;
-      border-bottom: 1px solid var(--border);
-    }
+    header { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
 
     header h1 {
       font-family: 'Cinzel', serif;
@@ -55,6 +50,34 @@
     }
 
     header p { color: var(--muted); font-style: italic; font-size: 1rem; }
+
+    .mode-toggle {
+      display: flex;
+      gap: 0;
+      margin: 1.2rem auto 0;
+      max-width: 320px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .mode-btn {
+      flex: 1;
+      background: rgba(0,0,0,0.3);
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.07em;
+      padding: 0.55rem 0.5rem;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+
+    .mode-btn + .mode-btn { border-left: 1px solid var(--border); }
+    .mode-btn:hover { color: var(--frost); }
+    .mode-btn.active { background: rgba(122,179,200,0.12); color: var(--ice); }
 
     .section {
       background: rgba(255,255,255,0.03);
@@ -117,18 +140,14 @@
     select option { background: var(--deep); }
     input[readonly] { color: var(--muted); cursor: default; }
 
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-    }
-
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
     .two-col .field { margin-bottom: 0; }
 
-    .player-count-btns { display: flex; gap: 0.8rem; margin-top: 0.5rem; }
+    .player-count-btns { display: flex; gap: 0.8rem; margin-top: 0.5rem; flex-wrap: wrap; }
 
     .pc-btn {
       flex: 1;
+      min-width: 44px;
       background: rgba(0,0,0,0.3);
       border: 1px solid var(--border);
       border-radius: 3px;
@@ -154,7 +173,6 @@
       margin: 1rem 0 0.5rem;
     }
 
-    /* OOA toggles */
     .ooa-toggle-row {
       display: flex;
       align-items: center;
@@ -179,14 +197,10 @@
       min-width: 56px;
     }
 
-    .toggle-btn.active {
-      background: rgba(139,58,58,0.2);
-      border-color: var(--danger);
-      color: #c08080;
-    }
+    .toggle-btn.active { background: rgba(139,58,58,0.2); border-color: var(--danger); color: #c08080; }
 
     .ooa-detail {
-      margin: 0.5rem 0 0.8rem 0;
+      margin: 0.5rem 0 0.8rem;
       padding: 0.8rem;
       background: rgba(139,58,58,0.07);
       border: 1px solid rgba(139,58,58,0.2);
@@ -195,16 +209,8 @@
 
     .ooa-detail select, .ooa-detail input { margin-bottom: 0; }
 
-    /* Dynamic rows */
-    .dyn-row {
-      display: grid;
-      gap: 0.5rem;
-      align-items: center;
-      margin-bottom: 0.45rem;
-    }
-
-    .dyn-row-3 { grid-template-columns: 2fr 1.2fr auto; }
-    .dyn-row-2 { grid-template-columns: 1fr auto; }
+    .dyn-row { display: grid; gap: 0.5rem; align-items: center; margin-bottom: 0.45rem; }
+    .dyn-row-3   { grid-template-columns: 2fr 1.2fr auto; }
     .dyn-row-item { grid-template-columns: 1fr 1.6fr auto; }
     .dyn-row-sell { grid-template-columns: 2fr 0.8fr auto; }
 
@@ -238,30 +244,7 @@
 
     .btn-add:hover { border-color: var(--frost); color: var(--frost); }
 
-    /* Gold bar */
-    .gold-bar {
-      background: rgba(201,168,76,0.07);
-      border: 1px solid rgba(201,168,76,0.25);
-      border-radius: 3px;
-      padding: 0.8rem 1rem;
-      margin-bottom: 1rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 0.4rem 1rem;
-    }
-
-    .gold-bar-item {
-      font-size: 0.88rem;
-      color: var(--muted);
-    }
-
-    .gold-bar-item b { color: var(--gold); }
-
-    .gold-bar-item.remaining { color: var(--ice); }
-    .gold-bar-item.remaining b { color: var(--ice); font-size: 1.05rem; }
-    .gold-bar-item.negative b { color: #c08080; }
-
-    /* Level-up highlight */
+    /* Level-up */
     .levelup-box {
       background: rgba(201,168,76,0.08);
       border: 1px solid rgba(201,168,76,0.3);
@@ -275,22 +258,37 @@
       font-size: 0.82rem;
       color: var(--gold);
       letter-spacing: 0.08em;
-      margin-bottom: 0.6rem;
+      margin-bottom: 0.8rem;
     }
 
-    /* OOG item toggle */
-    .oog-item-toggle-row {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      margin-top: 0.4rem;
+    .improvement-row {
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+      padding-bottom: 0.8rem;
+      margin-bottom: 0.8rem;
     }
 
-    .oog-item-toggle-label { font-size: 0.88rem; color: var(--muted); }
+    .improvement-row:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
 
-    .oog-item-fields { margin-top: 0.5rem; }
+    .improvement-sub { margin-top: 0.5rem; }
 
-    /* Submit */
+    /* Gold bar */
+    .gold-bar {
+      background: rgba(201,168,76,0.07);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 3px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 0.4rem 1rem;
+    }
+
+    .gold-bar-item { font-size: 0.88rem; color: var(--muted); }
+    .gold-bar-item b { color: var(--gold); }
+    .gold-bar-item.remaining { color: var(--ice); }
+    .gold-bar-item.remaining b { color: var(--ice); font-size: 1.05rem; }
+    .gold-bar-item.negative b { color: #c08080; }
+
     .btn-submit {
       background: linear-gradient(135deg, #1a3a50, #0d2535);
       border: 1px solid var(--frost);
@@ -308,24 +306,12 @@
       margin-top: 0.5rem;
     }
 
-    .btn-submit:hover:not(:disabled) {
-      background: linear-gradient(135deg, #22485f, #152d40);
-      box-shadow: 0 0 20px rgba(122,179,200,0.2);
-    }
-
+    .btn-submit:hover:not(:disabled) { background: linear-gradient(135deg, #22485f, #152d40); box-shadow: 0 0 20px rgba(122,179,200,0.2); }
     .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .status-msg {
-      border-radius: 3px;
-      font-style: italic;
-      margin-top: 1rem;
-      padding: 0.8rem 1rem;
-      text-align: center;
-      display: none;
-    }
-
+    .status-msg { border-radius: 3px; font-style: italic; margin-top: 1rem; padding: 0.8rem 1rem; text-align: center; display: none; }
     .status-msg.success { background: rgba(50,120,80,0.2); border: 1px solid #3a7a50; color: #7acca0; display: block; }
-    .status-msg.error { background: rgba(139,58,58,0.2); border: 1px solid var(--danger); color: #c08080; display: block; }
+    .status-msg.error   { background: rgba(139,58,58,0.2); border: 1px solid var(--danger); color: #c08080; display: block; }
 
     .hidden { display: none !important; }
   </style>
@@ -335,10 +321,13 @@
 
   <header>
     <h1>After-Action Report</h1>
-    <p>Record what happened in the ruins — together, while it's fresh</p>
+    <p id="header-sub">Record what happened in the ruins</p>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="mode-btn-group" onclick="setMode('group')">Group Session</button>
+      <button class="mode-btn" id="mode-btn-solo" onclick="setMode('solo')">Solo</button>
+    </div>
   </header>
 
-  <!-- GAME DETAILS -->
   <div class="section">
     <div class="section-title">Game Details</div>
     <div class="two-col">
@@ -346,7 +335,7 @@
         <label>Date</label>
         <input type="date" id="game_date">
       </div>
-      <div class="field">
+      <div class="field" id="recorded-by-field">
         <label>Recorded By</label>
         <input type="text" id="recorded_by" placeholder="Your name">
       </div>
@@ -382,16 +371,16 @@
       <label>Notes (optional)</label>
       <textarea id="game_notes" rows="2" placeholder="Memorable moments, house rules used, etc."></textarea>
     </div>
-    <div class="field">
+    <div class="field" id="player-count-field">
       <label>Number of Warbands</label>
       <div class="player-count-btns">
-        <button class="pc-btn" onclick="setPlayerCount(2)">2</button>
-        <button class="pc-btn" onclick="setPlayerCount(3)">3</button>
-        <button class="pc-btn" onclick="setPlayerCount(4)">4</button>
-        <button class="pc-btn" onclick="setPlayerCount(5)">5</button>
-        <button class="pc-btn" onclick="setPlayerCount(6)">6</button>
-        <button class="pc-btn" onclick="setPlayerCount(7)">7</button>
-        <button class="pc-btn" onclick="setPlayerCount(8)">8</button>
+        <button class="pc-btn" onclick="setPlayerCount(2, this)">2</button>
+        <button class="pc-btn" onclick="setPlayerCount(3, this)">3</button>
+        <button class="pc-btn" onclick="setPlayerCount(4, this)">4</button>
+        <button class="pc-btn" onclick="setPlayerCount(5, this)">5</button>
+        <button class="pc-btn" onclick="setPlayerCount(6, this)">6</button>
+        <button class="pc-btn" onclick="setPlayerCount(7, this)">7</button>
+        <button class="pc-btn" onclick="setPlayerCount(8, this)">8</button>
       </div>
     </div>
   </div>
@@ -410,37 +399,102 @@
 
   const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
 
+  const SPELLS = {
+    'Chronomancer': [
+      { name: 'Crumble', cn: 10 }, { name: 'Decay', cn: 12 }, { name: 'Fast Act', cn: 8 },
+      { name: 'Fleet Feet', cn: 10 }, { name: 'Petrify', cn: 10 }, { name: 'Slow', cn: 10 },
+      { name: 'Time Store', cn: 14 }, { name: 'Time Walk', cn: 14 }
+    ],
+    'Elementalist': [
+      { name: 'Call Storm', cn: 12 }, { name: 'Destructive Sphere', cn: 12 }, { name: 'Elemental Ball', cn: 12 },
+      { name: 'Elemental Bolt', cn: 12 }, { name: 'Elemental Hammer', cn: 10 }, { name: 'Elemental Shield', cn: 10 },
+      { name: 'Scatter Shot', cn: 12 }, { name: 'Wall', cn: 10 }
+    ],
+    'Enchanter': [
+      { name: 'Animate Construct', cn: 10 }, { name: 'Control Construct', cn: 12 }, { name: 'Embed Enchantment', cn: 14 },
+      { name: 'Enchant Armour', cn: 8 }, { name: 'Enchant Weapon', cn: 8 }, { name: 'Grenade', cn: 10 },
+      { name: 'Strength', cn: 10 }, { name: 'Telekinesis', cn: 10 }
+    ],
+    'Illusionist': [
+      { name: 'Beauty', cn: 10 }, { name: 'Blink', cn: 12 }, { name: "Fool's Gold", cn: 10 },
+      { name: 'Glow', cn: 10 }, { name: 'Illusionary Soldier', cn: 12 }, { name: 'Invisibility', cn: 12 },
+      { name: 'Teleport', cn: 10 }, { name: 'Transpose', cn: 12 }
+    ],
+    'Necromancer': [
+      { name: 'Animate Skull', cn: 8 }, { name: 'Bone Dart', cn: 10 }, { name: 'Bones of the Earth', cn: 10 },
+      { name: 'Control Undead', cn: 12 }, { name: 'Raise Zombie', cn: 10 }, { name: 'Spell Eater', cn: 12 },
+      { name: 'Steal Health', cn: 10 }, { name: 'Strike Dead', cn: 18 }
+    ],
+    'Sigilist': [
+      { name: 'Absorb Knowledge', cn: 12 }, { name: 'Bridge', cn: 10 }, { name: 'Draining Word', cn: 14 },
+      { name: 'Explosive Rune', cn: 10 }, { name: 'Furious Quill', cn: 10 }, { name: 'Power Word', cn: 14 },
+      { name: 'Push', cn: 8 }, { name: 'Write Scroll', cn: 12 }
+    ],
+    'Soothsayer': [
+      { name: 'Awareness', cn: 12 }, { name: 'Combat Awareness', cn: 12 }, { name: 'Mind Control', cn: 12 },
+      { name: 'Mind Lock', cn: 12 }, { name: 'Reveal Secret', cn: 12 }, { name: 'Suggestion', cn: 12 },
+      { name: 'True Sight', cn: 12 }, { name: 'Wizard Eye', cn: 12 }
+    ],
+    'Summoner': [
+      { name: 'Control Demon', cn: 12 }, { name: 'Imp', cn: 10 }, { name: 'Leap', cn: 10 },
+      { name: 'Plague of Insects', cn: 12 }, { name: 'Planar Tear', cn: 12 }, { name: 'Plane Walk', cn: 10 },
+      { name: 'Possess', cn: 12 }, { name: 'Summon Demon', cn: 12 }
+    ],
+    'Thaumaturge': [
+      { name: 'Banish', cn: 10 }, { name: 'Blinding Light', cn: 10 }, { name: 'Circle of Protection', cn: 10 },
+      { name: 'Destroy Undead', cn: 10 }, { name: 'Dispel', cn: 8 }, { name: 'Heal', cn: 8 },
+      { name: 'Miraculous Cure', cn: 14 }, { name: 'Shield', cn: 8 }
+    ],
+    'Witch': [
+      { name: 'Animal Companion', cn: 12 }, { name: 'Brew Potion', cn: 12 }, { name: 'Control Animal', cn: 12 },
+      { name: 'Curse', cn: 10 }, { name: 'Familiar', cn: 10 }, { name: 'Fog', cn: 10 },
+      { name: 'Mud', cn: 8 }, { name: 'Poison Dart', cn: 10 }
+    ]
+  };
+
+  const SCHOOL_RELATIONS = {
+    'Chronomancer': { allied: ['Elementalist', 'Necromancer', 'Soothsayer'], opposed: 'Enchanter' },
+    'Elementalist':  { allied: ['Chronomancer', 'Enchanter', 'Summoner'],    opposed: 'Illusionist' },
+    'Enchanter':     { allied: ['Elementalist', 'Sigilist', 'Witch'],        opposed: 'Chronomancer' },
+    'Illusionist':   { allied: ['Sigilist', 'Soothsayer', 'Thaumaturge'],    opposed: 'Elementalist' },
+    'Necromancer':   { allied: ['Chronomancer', 'Summoner', 'Witch'],        opposed: 'Thaumaturge' },
+    'Sigilist':      { allied: ['Enchanter', 'Illusionist', 'Thaumaturge'],  opposed: 'Summoner' },
+    'Soothsayer':    { allied: ['Chronomancer', 'Illusionist', 'Thaumaturge'], opposed: 'Witch' },
+    'Summoner':      { allied: ['Elementalist', 'Necromancer', 'Witch'],     opposed: 'Sigilist' },
+    'Thaumaturge':   { allied: ['Illusionist', 'Sigilist', 'Soothsayer'],    opposed: 'Necromancer' },
+    'Witch':         { allied: ['Enchanter', 'Necromancer', 'Summoner'],     opposed: 'Soothsayer' },
+  };
+
+  const STAT_IMPROVEMENTS = [
+    { value: 'fight',  label: '+1 Fight' },
+    { value: 'shoot',  label: '+1 Shoot' },
+    { value: 'will',   label: '+1 Will' },
+    { value: 'health', label: '+1 Health (maximum)' },
+    { value: 'move',   label: '+1 Move' },
+    { value: 'armour', label: '-1 Armour (better defence)' },
+  ];
+
   const SOLDIER_TYPES = [
-    { name: 'Apothecary', cost: 75 },
-    { name: 'Archer', cost: 75 },
-    { name: 'Barbarian', cost: 125 },
-    { name: 'Crossbowman', cost: 75 },
-    { name: 'Infantryman', cost: 50 },
-    { name: 'Knight', cost: 125 },
-    { name: 'Man-at-Arms', cost: 75 },
-    { name: 'Marksman', cost: 125 },
-    { name: 'Ranger', cost: 125 },
-    { name: 'Templar', cost: 125 },
-    { name: 'Thief', cost: 0 },
-    { name: 'Thug', cost: 0 },
-    { name: 'Tracker', cost: 100 },
-    { name: 'Treasure Hunter', cost: 100 },
+    { name: 'Apothecary', cost: 75 }, { name: 'Archer', cost: 75 },
+    { name: 'Barbarian', cost: 125 }, { name: 'Crossbowman', cost: 75 },
+    { name: 'Infantryman', cost: 50 }, { name: 'Knight', cost: 125 },
+    { name: 'Man-at-Arms', cost: 75 }, { name: 'Marksman', cost: 125 },
+    { name: 'Ranger', cost: 125 }, { name: 'Templar', cost: 125 },
+    { name: 'Thief', cost: 0 }, { name: 'Thug', cost: 0 },
+    { name: 'Tracker', cost: 100 }, { name: 'Treasure Hunter', cost: 100 },
     { name: 'War Hound', cost: 10 },
   ];
 
   const ITEM_TYPES = ['potion','scroll','grimoire','magic_weapon','magic_armour','magic_item'];
-  const ITEM_TYPE_LABELS = {
-    potion: 'Potion', scroll: 'Scroll', grimoire: 'Grimoire',
-    magic_weapon: 'Magic Weapon', magic_armour: 'Magic Armour', magic_item: 'Magic Item'
-  };
+  const ITEM_LABELS = { potion:'Potion', scroll:'Scroll', grimoire:'Grimoire', magic_weapon:'Magic Weapon', magic_armour:'Magic Armour', magic_item:'Magic Item' };
 
   document.getElementById('game_date').value = new Date().toISOString().split('T')[0];
 
+  let mode = 'group';
   let playerCount = 0;
   let warbandData = [];
   let counters = { cas: 0, item: 0, hired: 0, purch: 0, sold: 0 };
-  let ooaState = {}; // 'wiz_N': bool, 'app_N': bool
-  let oogItemState = {}; // 'wiz_N': bool, 'app_N': bool
+  let ooaState = {};
 
   async function loadWarbands() {
     try {
@@ -459,10 +513,37 @@
     return 1;
   }
 
-  function setPlayerCount(n) {
+  function getSelectedWarband(idx) {
+    const id = document.getElementById('wb_select_' + idx)?.value;
+    return warbandData.find(w => w.warband_id === id) || null;
+  }
+
+  // ── MODE ──────────────────────────────────────────────────────────
+
+  function setMode(m) {
+    mode = m;
+    document.getElementById('mode-btn-group').classList.toggle('active', m === 'group');
+    document.getElementById('mode-btn-solo').classList.toggle('active', m === 'solo');
+    document.getElementById('header-sub').textContent = m === 'solo'
+      ? 'Record your own warband at your own pace'
+      : 'Record what happened in the ruins — together, while it\'s fresh';
+
+    if (m === 'solo') {
+      document.getElementById('player-count-field').classList.add('hidden');
+      setPlayerCount(1, null);
+    } else {
+      document.getElementById('player-count-field').classList.remove('hidden');
+      playerCount = 0;
+      document.querySelectorAll('.pc-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('warband-sections').innerHTML = '';
+      document.getElementById('submit-section').classList.add('hidden');
+    }
+  }
+
+  function setPlayerCount(n, btn) {
     playerCount = n;
     document.querySelectorAll('.pc-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
+    if (btn) btn.classList.add('active');
     buildWarbandSections(n);
     document.getElementById('submit-section').classList.remove('hidden');
   }
@@ -473,18 +554,22 @@
     for (let i = 1; i <= n; i++) c.appendChild(buildWarbandBlock(i));
   }
 
-  function itemTypeOptions() {
-    return ITEM_TYPES.map(t => `<option value="${t}">${ITEM_TYPE_LABELS[t]}</option>`).join('');
-  }
+  // ── WARBAND BLOCK ─────────────────────────────────────────────────
 
-  function soldierTypeOptions() {
-    return SOLDIER_TYPES.map(s => `<option value="${s.name}" data-cost="${s.cost}">${s.name} (${s.cost === 0 ? 'free' : s.cost + ' gc'})</option>`).join('');
-  }
-
-  function wbSelectOptions() {
+  function wbOptions() {
     if (!warbandData.length) return '<option value="">No warbands loaded</option>';
     return warbandData.map(w =>
       `<option value="${w.warband_id}">${w.wizard_name} (${w.player_name})</option>`
+    ).join('');
+  }
+
+  function itemTypeOptions() {
+    return ITEM_TYPES.map(t => `<option value="${t}">${ITEM_LABELS[t]}</option>`).join('');
+  }
+
+  function soldierTypeOptions() {
+    return SOLDIER_TYPES.map(s =>
+      `<option value="${s.name}" data-cost="${s.cost}">${s.name} (${s.cost === 0 ? 'free' : s.cost + ' gc'})</option>`
     ).join('');
   }
 
@@ -492,19 +577,20 @@
     const div = document.createElement('div');
     div.className = 'section';
     div.id = 'wb-block-' + idx;
+    const title = mode === 'solo' ? 'Your Warband' : `Warband ${idx}`;
 
     div.innerHTML = `
-      <div class="section-title">Warband ${idx}</div>
+      <div class="section-title">${title}</div>
 
       <div class="field">
         <label>Warband</label>
         <select id="wb_select_${idx}" onchange="onWarbandSelect(${idx})">
           <option value="">— Select warband —</option>
-          ${wbSelectOptions()}
+          ${wbOptions()}
         </select>
       </div>
 
-      <!-- ── PHASE 1: INJURY & DEATH ── -->
+      <!-- ── I. INJURY & DEATH ── -->
       <div class="phase-header">I. Injury &amp; Death</div>
 
       <div class="ooa-toggle-row">
@@ -537,50 +623,13 @@
       <div id="casualties_${idx}"></div>
       <button class="btn-add" onclick="addCasualty(${idx})">+ Add Soldier OOA</button>
 
-      <!-- ── PHASE 2: OUT OF GAME SPELLS ── -->
-      <div class="phase-header">II. Out of Game Spells</div>
-
-      <div class="field">
-        <label>Wizard casts (optional)</label>
-        <select id="wiz_oog_${idx}">
-          <option value="">— None —</option>
-        </select>
-        <div class="oog-item-toggle-row">
-          <span class="oog-item-toggle-label">Created an item?</span>
-          <button class="toggle-btn" id="wiz_oog_item_btn_${idx}" onclick="toggleOOGItem('wiz',${idx})">No</button>
-        </div>
-        <div class="oog-item-fields hidden" id="wiz_oog_item_${idx}">
-          <div class="two-col" style="margin-top:0.5rem">
-            <select id="wiz_oog_itype_${idx}">${itemTypeOptions()}</select>
-            <input type="text" id="wiz_oog_iname_${idx}" placeholder="Item name / description">
-          </div>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Apprentice casts (optional)</label>
-        <select id="app_oog_${idx}">
-          <option value="">— None —</option>
-        </select>
-        <div class="oog-item-toggle-row">
-          <span class="oog-item-toggle-label">Created an item?</span>
-          <button class="toggle-btn" id="app_oog_item_btn_${idx}" onclick="toggleOOGItem('app',${idx})">No</button>
-        </div>
-        <div class="oog-item-fields hidden" id="app_oog_item_${idx}">
-          <div class="two-col" style="margin-top:0.5rem">
-            <select id="app_oog_itype_${idx}">${itemTypeOptions()}</select>
-            <input type="text" id="app_oog_iname_${idx}" placeholder="Item name / description">
-          </div>
-        </div>
-      </div>
-
-      <!-- ── PHASE 3: EXPERIENCE & LEVEL ── -->
-      <div class="phase-header">III. Experience &amp; Level</div>
+      <!-- ── II. EXPERIENCE & LEVEL ── -->
+      <div class="phase-header">II. Experience &amp; Level</div>
 
       <div class="two-col">
         <div class="field">
           <label>XP Earned This Game</label>
-          <input type="number" id="wb_xp_${idx}" min="0" value="0" oninput="updateXPDisplay(${idx})">
+          <input type="number" id="wb_xp_${idx}" min="0" max="300" value="0" oninput="updateXPDisplay(${idx})">
         </div>
         <div class="field">
           <label>Projected Total XP</label>
@@ -588,28 +637,15 @@
         </div>
       </div>
 
-      <div id="levelup_box_${idx}" class="levelup-box hidden">
-        <div class="levelup-label">Level Up — choose one improvement:</div>
-        <select id="levelup_type_${idx}" onchange="onLevelupType(${idx})">
-          <option value="">— Select improvement —</option>
-          <option value="fight">+1 Fight</option>
-          <option value="shoot">+1 Shoot</option>
-          <option value="will">+1 Will</option>
-          <option value="health">+1 Health (maximum)</option>
-          <option value="move">+1 Move</option>
-          <option value="armour">-1 Armour number (better defence)</option>
-          <option value="spell">Improve a Spell (−1 Casting Number)</option>
-        </select>
-        <div id="levelup_spell_row_${idx}" class="hidden" style="margin-top:0.6rem">
-          <label>Which spell?</label>
-          <select id="levelup_spell_${idx}">
-            <option value="">— Select spell —</option>
-          </select>
+      <div id="levelup_section_${idx}" class="hidden">
+        <div class="levelup-box">
+          <div class="levelup-label" id="levelup_label_${idx}">Level Up!</div>
+          <div id="levelup_rows_${idx}"></div>
         </div>
       </div>
 
-      <!-- ── PHASE 4: COUNTING TREASURE ── -->
-      <div class="phase-header">IV. Counting Treasure</div>
+      <!-- ── III. COUNTING TREASURE ── -->
+      <div class="phase-header">III. Counting Treasure</div>
 
       <div class="two-col">
         <div class="field">
@@ -626,8 +662,8 @@
       <div id="items_${idx}"></div>
       <button class="btn-add" onclick="addItem(${idx})">+ Add Item Found</button>
 
-      <!-- ── PHASE 5: SPEND TREASURE ── -->
-      <div class="phase-header">V. Spend Treasure</div>
+      <!-- ── IV. SPEND TREASURE ── -->
+      <div class="phase-header">IV. Spend Treasure</div>
 
       <div class="gold-bar" id="gold_bar_${idx}">
         <div class="gold-bar-item"><b id="gs_start_${idx}">—</b><br>Starting</div>
@@ -653,76 +689,43 @@
     return div;
   }
 
-  // ── WARBAND SELECTION ──────────────────────────────────────────────
+  // ── WARBAND SELECT ────────────────────────────────────────────────
 
   function onWarbandSelect(idx) {
-    const wbId = document.getElementById('wb_select_' + idx).value;
-    const wb = warbandData.find(w => w.warband_id === wbId);
-
-    // Reset casualty list
     document.getElementById('casualties_' + idx).innerHTML = '';
-
-    // Populate spell dropdowns (OOG + level-up)
+    const wb = getSelectedWarband(idx);
     const spells = wb ? (wb.spells || []) : [];
-    const spellOpts = spells.map(s =>
-      `<option value="${s.spell_id}|${s.casting_number}">${s.spell_name} (CN ${s.casting_number})</option>`
-    ).join('');
 
-    ['wiz_oog_', 'app_oog_'].forEach(prefix => {
-      const sel = document.getElementById(prefix + idx);
-      sel.innerHTML = '<option value="">— None —</option>' + spells.map(s =>
-        `<option value="${s.spell_id}">${s.spell_name}</option>`
-      ).join('');
+    // Populate spell selectors in any existing improvement rows
+    document.querySelectorAll(`[id^="imp_spell_sel_${idx}_"]`).forEach(sel => {
+      populateSpellImproveOptions(sel, spells);
     });
 
-    const luSpell = document.getElementById('levelup_spell_' + idx);
-    luSpell.innerHTML = '<option value="">— Select spell —</option>' + spells.map(s =>
-      `<option value="${s.spell_id}|${s.casting_number}">${s.spell_name} (current CN: ${s.casting_number})</option>`
-    ).join('');
-
-    // Populate sell items dropdown
-    const items = wb ? (wb.items || []).filter(i => i.status === 'active') : [];
-    // items will be added dynamically when addSale is called
-    document.getElementById('sold_' + idx).innerHTML = '';
-
-    // Update XP display
-    if (wb) {
-      document.getElementById('wb_xp_total_' + idx).placeholder = '';
-      updateXPDisplay(idx);
-    }
-
+    updateXPDisplay(idx);
     updateGoldSummary(idx);
   }
 
-  // ── PHASE 1 HELPERS ───────────────────────────────────────────────
+  // ── PHASE I ───────────────────────────────────────────────────────
 
   function toggleOOA(type, idx) {
     const key = type + '_' + idx;
     ooaState[key] = !ooaState[key];
-    const btn = document.getElementById(type + '_ooa_btn_' + idx);
+    const btn    = document.getElementById(type + '_ooa_btn_' + idx);
     const detail = document.getElementById(type + '_ooa_detail_' + idx);
-    if (ooaState[key]) {
-      btn.textContent = 'Yes';
-      btn.classList.add('active');
-      detail.classList.remove('hidden');
-    } else {
-      btn.textContent = 'No';
-      btn.classList.remove('active');
-      detail.classList.add('hidden');
-    }
+    btn.textContent = ooaState[key] ? 'Yes' : 'No';
+    btn.classList.toggle('active', ooaState[key]);
+    detail.classList.toggle('hidden', !ooaState[key]);
   }
 
   function onOOAOutcome(type, idx) {
     const val = document.getElementById(type + '_ooa_out_' + idx).value;
-    const injField = document.getElementById(type + '_ooa_inj_' + idx);
-    if (val === 'injury') injField.classList.remove('hidden');
-    else injField.classList.add('hidden');
+    document.getElementById(type + '_ooa_inj_' + idx).classList.toggle('hidden', val !== 'injury');
   }
 
   function addCasualty(wbIdx) {
     counters.cas++;
     const id = `cas_${wbIdx}_${counters.cas}`;
-    const wb = warbandData.find(w => w.warband_id === document.getElementById('wb_select_' + wbIdx).value);
+    const wb = getSelectedWarband(wbIdx);
     const soldiers = wb ? (wb.soldiers || []).filter(s => s.status !== 'dead') : [];
     const solOpts = soldiers.length
       ? soldiers.map(s => `<option value="${s.soldier_id}">${s.soldier_name} (${s.soldier_type})</option>`).join('')
@@ -732,10 +735,7 @@
     div.className = 'dyn-row dyn-row-3';
     div.id = id;
     div.innerHTML = `
-      <select name="cas_sol_${id}">
-        <option value="">— Soldier —</option>
-        ${solOpts}
-      </select>
+      <select name="cas_sol_${id}"><option value="">— Soldier —</option>${solOpts}</select>
       <select name="cas_res_${id}">
         <option value="dead">Killed</option>
         <option value="recovering">Recovering</option>
@@ -746,53 +746,163 @@
     document.getElementById('casualties_' + wbIdx).appendChild(div);
   }
 
-  // ── PHASE 2 HELPERS ───────────────────────────────────────────────
+  // ── PHASE II: LEVEL-UP ────────────────────────────────────────────
 
-  function toggleOOGItem(type, idx) {
-    const key = type + '_' + idx;
-    oogItemState[key] = !oogItemState[key];
-    const btn = document.getElementById(type + '_oog_item_btn_' + idx);
-    const fields = document.getElementById(type + '_oog_item_' + idx);
-    if (oogItemState[key]) {
-      btn.textContent = 'Yes';
-      btn.classList.add('active');
-      fields.classList.remove('hidden');
+  function updateXPDisplay(idx) {
+    const wb = getSelectedWarband(idx);
+    if (!wb) return;
+    const currentXP  = parseInt(wb.xp) || 0;
+    const earned     = Math.min(parseInt(document.getElementById('wb_xp_' + idx).value) || 0, 300);
+    const newXP      = currentXP + earned;
+    const oldLevel   = xpLevel(currentXP);
+    const newLevel   = xpLevel(newXP);
+    const gained     = Math.max(0, newLevel - oldLevel);
+
+    document.getElementById('wb_xp_total_' + idx).value = `${newXP} XP — Level ${newLevel}`;
+
+    const section = document.getElementById('levelup_section_' + idx);
+    const rows    = document.getElementById('levelup_rows_' + idx);
+
+    if (gained > 0) {
+      section.classList.remove('hidden');
+      document.getElementById('levelup_label_' + idx).textContent =
+        gained === 1 ? 'Level Up! Choose 1 improvement:' : `${gained} Levels Up! Choose ${gained} improvements:`;
+      // Rebuild improvement rows
+      rows.innerHTML = '';
+      for (let r = 0; r < gained; r++) rows.appendChild(buildImprovementRow(idx, r));
     } else {
-      btn.textContent = 'No';
-      btn.classList.remove('active');
-      fields.classList.add('hidden');
+      section.classList.add('hidden');
+      rows.innerHTML = '';
     }
   }
 
-  // ── PHASE 3 HELPERS ───────────────────────────────────────────────
+  function buildImprovementRow(idx, rowIdx) {
+    const div = document.createElement('div');
+    div.className = 'improvement-row';
+    div.id = `imp_${idx}_${rowIdx}`;
 
-  function updateXPDisplay(idx) {
-    const wbId = document.getElementById('wb_select_' + idx).value;
-    const wb = warbandData.find(w => w.warband_id === wbId);
-    if (!wb) return;
+    const statOpts = STAT_IMPROVEMENTS.map(o =>
+      `<option value="${o.value}">${o.label}</option>`
+    ).join('');
 
-    const currentXP = parseInt(wb.xp) || 0;
-    const earned = parseInt(document.getElementById('wb_xp_' + idx).value) || 0;
-    const newXP = currentXP + earned;
-    const oldLevel = xpLevel(currentXP);
-    const newLevel = xpLevel(newXP);
-
-    document.getElementById('wb_xp_total_' + idx).value =
-      `${newXP} XP (Level ${newLevel})`;
-
-    const box = document.getElementById('levelup_box_' + idx);
-    if (newLevel > oldLevel) box.classList.remove('hidden');
-    else box.classList.add('hidden');
+    div.innerHTML = `
+      <div class="field" style="margin-bottom:0.5rem">
+        <label>Improvement ${rowIdx + 1}</label>
+        <select id="imp_type_${idx}_${rowIdx}" onchange="onImprovementType(${idx},${rowIdx})">
+          <option value="">— Select improvement —</option>
+          ${statOpts}
+          <option value="spell_improve">Improve a Spell (−1 Casting Number)</option>
+          <option value="spell_learn">Learn a New Spell</option>
+        </select>
+      </div>
+      <div id="imp_sub_improve_${idx}_${rowIdx}" class="improvement-sub hidden">
+        <div class="field">
+          <label>Which spell to improve?</label>
+          <select id="imp_spell_sel_${idx}_${rowIdx}">
+            <option value="">— Select spell —</option>
+          </select>
+        </div>
+      </div>
+      <div id="imp_sub_learn_${idx}_${rowIdx}" class="improvement-sub hidden">
+        <div class="two-col">
+          <div class="field">
+            <label>School</label>
+            <select id="imp_learn_school_${idx}_${rowIdx}" onchange="onLearnSchool(${idx},${rowIdx})">
+              <option value="">— School —</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Spell</label>
+            <select id="imp_learn_spell_${idx}_${rowIdx}">
+              <option value="">— Spell —</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    `;
+    return div;
   }
 
-  function onLevelupType(idx) {
-    const val = document.getElementById('levelup_type_' + idx).value;
-    const spellRow = document.getElementById('levelup_spell_row_' + idx);
-    if (val === 'spell') spellRow.classList.remove('hidden');
-    else spellRow.classList.add('hidden');
+  function populateSpellImproveOptions(sel, spells) {
+    sel.innerHTML = '<option value="">— Select spell —</option>' +
+      spells.map(s => `<option value="${s.spell_id}|${s.casting_number}">${s.spell_name} (CN ${s.casting_number})</option>`).join('');
   }
 
-  // ── PHASE 4 HELPERS ───────────────────────────────────────────────
+  function onImprovementType(idx, rowIdx) {
+    const val = document.getElementById(`imp_type_${idx}_${rowIdx}`).value;
+
+    document.getElementById(`imp_sub_improve_${idx}_${rowIdx}`).classList.add('hidden');
+    document.getElementById(`imp_sub_learn_${idx}_${rowIdx}`).classList.add('hidden');
+
+    if (val === 'spell_improve') {
+      const wb = getSelectedWarband(idx);
+      populateSpellImproveOptions(
+        document.getElementById(`imp_spell_sel_${idx}_${rowIdx}`),
+        wb ? (wb.spells || []) : []
+      );
+      document.getElementById(`imp_sub_improve_${idx}_${rowIdx}`).classList.remove('hidden');
+
+    } else if (val === 'spell_learn') {
+      const wb  = getSelectedWarband(idx);
+      const wizSchool = wb ? wb.school : null;
+      const rel = wizSchool ? SCHOOL_RELATIONS[wizSchool] : null;
+      const schoolSel = document.getElementById(`imp_learn_school_${idx}_${rowIdx}`);
+
+      let opts = '<option value="">— School —</option>';
+      Object.keys(SPELLS).forEach(school => {
+        if (rel && school === rel.opposed) return;
+        let tag = '';
+        if (school === wizSchool) tag = ' (Domain)';
+        else if (rel && rel.allied.includes(school)) tag = ' (Allied, CN+2)';
+        else tag = ' (Neutral, CN+4)';
+        opts += `<option value="${school}">${school}${tag}</option>`;
+      });
+      schoolSel.innerHTML = opts;
+      document.getElementById(`imp_sub_learn_${idx}_${rowIdx}`).classList.remove('hidden');
+    }
+
+    enforceStatUniqueness(idx);
+  }
+
+  function onLearnSchool(idx, rowIdx) {
+    const school    = document.getElementById(`imp_learn_school_${idx}_${rowIdx}`).value;
+    const wb        = getSelectedWarband(idx);
+    const wizSchool = wb ? wb.school : null;
+    const rel       = wizSchool ? SCHOOL_RELATIONS[wizSchool] : null;
+    const spellSel  = document.getElementById(`imp_learn_spell_${idx}_${rowIdx}`);
+
+    if (!school || !SPELLS[school]) {
+      spellSel.innerHTML = '<option value="">— Spell —</option>';
+      return;
+    }
+
+    let bonus = 0;
+    if (school !== wizSchool && rel) {
+      bonus = rel.allied.includes(school) ? 2 : 4;
+    }
+
+    spellSel.innerHTML = '<option value="">— Spell —</option>' +
+      SPELLS[school].map(s => {
+        const cn = s.cn + bonus;
+        return `<option value="${school}|${s.name}|${s.cn}|${cn}">${s.name} (CN ${cn})</option>`;
+      }).join('');
+  }
+
+  function enforceStatUniqueness(idx) {
+    const statVals = new Set(STAT_IMPROVEMENTS.map(s => s.value));
+    const selectors = Array.from(document.querySelectorAll(`[id^="imp_type_${idx}_"]`));
+    const chosen = new Set(selectors.map(s => s.value).filter(v => statVals.has(v)));
+
+    selectors.forEach(sel => {
+      Array.from(sel.options).forEach(opt => {
+        if (statVals.has(opt.value)) {
+          opt.disabled = chosen.has(opt.value) && opt.value !== sel.value;
+        }
+      });
+    });
+  }
+
+  // ── PHASE III ─────────────────────────────────────────────────────
 
   function addItem(wbIdx) {
     counters.item++;
@@ -808,7 +918,7 @@
     document.getElementById('items_' + wbIdx).appendChild(div);
   }
 
-  // ── PHASE 5 HELPERS ───────────────────────────────────────────────
+  // ── PHASE IV ──────────────────────────────────────────────────────
 
   function addHired(wbIdx) {
     counters.hired++;
@@ -818,9 +928,7 @@
     div.id = id;
     div.innerHTML = `
       <input type="text" name="hrd_name_${id}" placeholder="Soldier name">
-      <select name="hrd_type_${id}" onchange="updateGoldSummary(${wbIdx})">
-        ${soldierTypeOptions()}
-      </select>
+      <select name="hrd_type_${id}" onchange="updateGoldSummary(${wbIdx})">${soldierTypeOptions()}</select>
       <button class="btn-remove" onclick="document.getElementById('${id}').remove();updateGoldSummary(${wbIdx})">✕</button>
     `;
     document.getElementById('hired_' + wbIdx).appendChild(div);
@@ -846,21 +954,17 @@
   function addSale(wbIdx) {
     counters.sold++;
     const id = `sld_${wbIdx}_${counters.sold}`;
-    const wbId = document.getElementById('wb_select_' + wbIdx).value;
-    const wb = warbandData.find(w => w.warband_id === wbId);
+    const wb    = getSelectedWarband(wbIdx);
     const items = wb ? (wb.items || []).filter(i => i.status === 'active') : [];
     const itemOpts = items.length
-      ? items.map(i => `<option value="${i.item_id}">${i.item_name} (${ITEM_TYPE_LABELS[i.item_type] || i.item_type})</option>`).join('')
+      ? items.map(i => `<option value="${i.item_id}">${i.item_name} (${ITEM_LABELS[i.item_type] || i.item_type})</option>`).join('')
       : '<option value="">— no items in inventory —</option>';
 
     const div = document.createElement('div');
     div.className = 'dyn-row dyn-row-sell';
     div.id = id;
     div.innerHTML = `
-      <select name="sld_item_${id}">
-        <option value="">— Item —</option>
-        ${itemOpts}
-      </select>
+      <select name="sld_item_${id}"><option value="">— Item —</option>${itemOpts}</select>
       <input type="number" name="sld_gold_${id}" placeholder="Gold received" min="0" oninput="updateGoldSummary(${wbIdx})">
       <button class="btn-remove" onclick="document.getElementById('${id}').remove();updateGoldSummary(${wbIdx})">✕</button>
     `;
@@ -868,22 +972,18 @@
   }
 
   function updateGoldSummary(idx) {
-    const wbId = document.getElementById('wb_select_' + idx).value;
-    const wb = warbandData.find(w => w.warband_id === wbId);
+    const wb        = getSelectedWarband(idx);
     const startGold = wb ? (parseInt(wb.gold) || 0) : null;
-    const earned = parseInt(document.getElementById('wb_gold_' + idx).value) || 0;
+    const earned    = parseInt(document.getElementById('wb_gold_' + idx).value) || 0;
 
     let spent = 0;
     document.querySelectorAll(`#hired_${idx} .dyn-row`).forEach(row => {
       const sel = row.querySelector('[name^="hrd_type_"]');
-      if (sel) {
-        const opt = sel.options[sel.selectedIndex];
-        spent += parseInt(opt?.dataset.cost || 0);
-      }
+      if (sel) spent += parseInt(sel.options[sel.selectedIndex]?.dataset.cost || 0);
     });
     document.querySelectorAll(`#purchased_${idx} .dyn-row`).forEach(row => {
-      const cost = row.querySelector('[name^="pur_cost_"]');
-      spent += parseInt(cost?.value || 0);
+      const c = row.querySelector('[name^="pur_cost_"]');
+      spent += parseInt(c?.value || 0);
     });
 
     let soldGold = 0;
@@ -892,10 +992,10 @@
       soldGold += parseInt(g?.value || 0);
     });
 
-    document.getElementById('gs_start_' + idx).textContent = startGold !== null ? startGold + ' gc' : '—';
-    document.getElementById('gs_earned_' + idx).textContent = '+' + earned + ' gc';
-    document.getElementById('gs_sold_' + idx).textContent = '+' + soldGold + ' gc';
-    document.getElementById('gs_spent_' + idx).textContent = '−' + spent + ' gc';
+    document.getElementById('gs_start_' + idx).textContent    = startGold !== null ? startGold + ' gc' : '—';
+    document.getElementById('gs_earned_' + idx).textContent   = '+' + earned + ' gc';
+    document.getElementById('gs_sold_' + idx).textContent     = '+' + soldGold + ' gc';
+    document.getElementById('gs_spent_' + idx).textContent    = '−' + spent + ' gc';
 
     if (startGold !== null) {
       const remaining = startGold + earned + soldGold - spent;
@@ -911,19 +1011,20 @@
 
   function collectWarbands() {
     const result = [];
+    const STATS  = new Set(STAT_IMPROVEMENTS.map(s => s.value));
+
     for (let i = 1; i <= playerCount; i++) {
       const wbId = document.getElementById('wb_select_' + i).value;
       if (!wbId) continue;
-      const wb = warbandData.find(w => w.warband_id === wbId);
+      const wb = getSelectedWarband(i);
 
-      // Phase 1 — injuries & deaths
+      // Phase I — injury & death
       const soldiers_killed = [], soldiers_recovering = [], injuries = [];
 
-      // Wizard OOA
       if (ooaState['wiz_' + i]) {
         const out = document.getElementById('wiz_ooa_out_' + i).value;
         const inj = document.getElementById('wiz_ooa_inj_' + i).value.trim();
-        if (out === 'recovering' || out === 'injury') {
+        if (out !== 'fine') {
           injuries.push({
             target_type: 'wizard',
             target_name: wb ? wb.wizard_name : 'Wizard',
@@ -932,11 +1033,10 @@
         }
       }
 
-      // Apprentice OOA
       if (ooaState['app_' + i]) {
         const out = document.getElementById('app_ooa_out_' + i).value;
         const inj = document.getElementById('app_ooa_inj_' + i).value.trim();
-        if (out === 'recovering' || out === 'injury') {
+        if (out !== 'fine') {
           injuries.push({
             target_type: 'apprentice',
             target_name: wb ? wb.apprentice_name : 'Apprentice',
@@ -945,7 +1045,6 @@
         }
       }
 
-      // Soldiers OOA
       document.querySelectorAll(`#casualties_${i} .dyn-row`).forEach(row => {
         const sol = row.querySelector('[name^="cas_sol_"]');
         const res = row.querySelector('[name^="cas_res_"]');
@@ -955,55 +1054,49 @@
         }
       });
 
-      // Phase 2 — OOG spells
-      const oog_items = [];
-      ['wiz', 'app'].forEach(type => {
-        if (oogItemState[type + '_' + i]) {
-          const itype = document.getElementById(type + '_oog_itype_' + i).value;
-          const iname = document.getElementById(type + '_oog_iname_' + i).value.trim();
-          if (iname) oog_items.push({ item_type: itype, item_name: iname });
+      // Phase II — XP & level-up
+      const xp_earned = Math.min(parseInt(document.getElementById('wb_xp_' + i).value) || 0, 300);
+      const stat_improvements = [], spell_improvements = [], spells_learned = [];
+
+      document.querySelectorAll(`[id^="imp_type_${i}_"]`).forEach(sel => {
+        const parts   = sel.id.split('_');
+        const rowIdx  = parts[parts.length - 1];
+        const val     = sel.value;
+
+        if (STATS.has(val)) {
+          stat_improvements.push({ stat: val, delta: val === 'armour' ? -1 : 1 });
+        } else if (val === 'spell_improve') {
+          const sv = document.getElementById(`imp_spell_sel_${i}_${rowIdx}`)?.value;
+          if (sv) {
+            const [spellId, currentCN] = sv.split('|');
+            spell_improvements.push({ spell_id: spellId, new_cn: parseInt(currentCN) - 1 });
+          }
+        } else if (val === 'spell_learn') {
+          const sv = document.getElementById(`imp_learn_spell_${i}_${rowIdx}`)?.value;
+          if (sv) {
+            const [school, name, base_cn, actual_cn] = sv.split('|');
+            spells_learned.push({ spell_name: name, school, base_casting_number: parseInt(base_cn), casting_number: parseInt(actual_cn) });
+          }
         }
       });
 
-      // Phase 3 — XP & level-up
-      const xp_earned = parseInt(document.getElementById('wb_xp_' + i).value) || 0;
-      let stat_improvement = null;
-      let spell_improvement = null;
-
-      const luType = document.getElementById('levelup_type_' + i)?.value;
-      if (luType && luType !== '') {
-        if (luType === 'spell') {
-          const spellVal = document.getElementById('levelup_spell_' + i).value;
-          if (spellVal) {
-            const [spellId, currentCN] = spellVal.split('|');
-            spell_improvement = { spell_id: spellId, new_cn: parseInt(currentCN) - 1 };
-          }
-        } else {
-          const delta = luType === 'armour' ? -1 : 1;
-          stat_improvement = { stat: luType, delta };
-        }
-      }
-
-      // Phase 4 — treasure
+      // Phase III — treasure
       const gold_earned = parseInt(document.getElementById('wb_gold_' + i).value) || 0;
-      const tokens = parseInt(document.getElementById('wb_tokens_' + i).value) || 0;
+      const tokens      = parseInt(document.getElementById('wb_tokens_' + i).value) || 0;
       const items_found = [];
       document.querySelectorAll(`#items_${i} .dyn-row`).forEach(row => {
         const itype = row.querySelector('[name^="itype_"]');
         const iname = row.querySelector('[name^="iname_"]');
-        if (iname?.value.trim()) {
-          items_found.push({ item_type: itype.value, item_name: iname.value.trim() });
-        }
+        if (iname?.value.trim()) items_found.push({ item_type: itype.value, item_name: iname.value.trim() });
       });
 
-      // Phase 5 — spend
+      // Phase IV — spend
       const soldiers_hired = [];
       document.querySelectorAll(`#hired_${i} .dyn-row`).forEach(row => {
         const name = row.querySelector('[name^="hrd_name_"]')?.value.trim();
         const sel  = row.querySelector('[name^="hrd_type_"]');
         if (name && sel) {
-          const cost = parseInt(sel.options[sel.selectedIndex]?.dataset.cost || 0);
-          soldiers_hired.push({ soldier_name: name, soldier_type: sel.value, cost });
+          soldiers_hired.push({ soldier_name: name, soldier_type: sel.value, cost: parseInt(sel.options[sel.selectedIndex]?.dataset.cost || 0) });
         }
       });
 
@@ -1012,22 +1105,14 @@
         const itype = row.querySelector('[name^="pur_type_"]');
         const iname = row.querySelector('[name^="pur_name_"]');
         const cost  = row.querySelector('[name^="pur_cost_"]');
-        if (iname?.value.trim()) {
-          items_purchased.push({
-            item_type: itype.value,
-            item_name: iname.value.trim(),
-            cost: parseInt(cost?.value || 0)
-          });
-        }
+        if (iname?.value.trim()) items_purchased.push({ item_type: itype.value, item_name: iname.value.trim(), cost: parseInt(cost?.value || 0) });
       });
 
       const items_sold = [];
       document.querySelectorAll(`#sold_${i} .dyn-row`).forEach(row => {
         const item = row.querySelector('[name^="sld_item_"]');
         const gold = row.querySelector('[name^="sld_gold_"]');
-        if (item?.value) {
-          items_sold.push({ item_id: item.value, gold_gained: parseInt(gold?.value || 0) });
-        }
+        if (item?.value) items_sold.push({ item_id: item.value, gold_gained: parseInt(gold?.value || 0) });
       });
 
       result.push({
@@ -1035,8 +1120,7 @@
         xp_earned, gold_earned, tokens,
         soldiers_killed, soldiers_recovering,
         items_found, injuries,
-        oog_items,
-        stat_improvement, spell_improvement,
+        stat_improvements, spell_improvements, spells_learned,
         soldiers_hired, items_purchased, items_sold
       });
     }
@@ -1048,13 +1132,13 @@
     const msg = document.getElementById('status-msg');
     msg.className = 'status-msg';
 
-    const date       = document.getElementById('game_date').value;
-    const scenario   = document.getElementById('scenario').value;
+    const date        = document.getElementById('game_date').value;
+    const scenario    = document.getElementById('scenario').value;
     const recorded_by = document.getElementById('recorded_by').value.trim();
 
-    if (!date || !scenario || !recorded_by) {
+    if (!date || !recorded_by) {
       msg.className = 'status-msg error';
-      msg.textContent = 'Please fill in date, scenario, and your name.';
+      msg.textContent = 'Please fill in the date and your name.';
       return;
     }
 
@@ -1081,7 +1165,7 @@
       const data = await res.json();
       if (data.success) {
         msg.className = 'status-msg success';
-        msg.textContent = `Game recorded! ID: ${data.game_id}. The city remembers all.`;
+        msg.textContent = `Recorded! Game ID: ${data.game_id}. The city remembers all.`;
         btn.textContent = 'Submitted';
       } else {
         throw new Error(data.error || 'Unknown error');
