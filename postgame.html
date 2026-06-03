@@ -499,7 +499,15 @@
     try {
       const res = await fetch(APPS_SCRIPT_URL + '?action=getWarbands');
       const data = await res.json();
-      if (data.success) warbandData = data.warbands.filter(w => w.status === 'active');
+      if (data.success) {
+        warbandData = data.warbands.filter(w => w.status === 'active');
+        // Refresh any dropdowns already on the page if sections were built before fetch completed
+        document.querySelectorAll('[id^="wb_select_"]').forEach(sel => {
+          const current = sel.value;
+          sel.innerHTML = '<option value="">— Select warband —</option>' + wbOptions();
+          sel.value = current;
+        });
+      }
     } catch (e) { console.warn('Could not load warbands:', e); }
   }
 

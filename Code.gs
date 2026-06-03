@@ -370,15 +370,14 @@ function submitGame(data) {
 // =============================================================================
 
 function updateWarbandXP(wbSheet, warband_id, xp_delta) {
-  // Frostgrave 2e level thresholds
-  const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
+  const LEVEL_XP = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
   const data = wbSheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     if (data[i][0] === warband_id) {
       const newXP = (Number(data[i][6]) || 0) + xp_delta;
-      let newLevel = 1;
+      let newLevel = 0;
       for (let l = LEVEL_XP.length - 1; l >= 0; l--) {
-        if (newXP >= LEVEL_XP[l]) { newLevel = l + 1; break; }
+        if (newXP >= LEVEL_XP[l]) { newLevel = l; break; }
       }
       wbSheet.getRange(i + 1, 7).setValue(newXP);    // col 7 = xp
       wbSheet.getRange(i + 1, 6).setValue(newLevel); // col 6 = level
