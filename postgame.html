@@ -397,7 +397,7 @@
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqoifOeC-A09QOyiHCnS0BLMDNo6sz0fTWsel7DcSxzIT05ZWntREg_ED_OGvaSMXu/exec';
 
-  const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
+  const LEVEL_XP = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
 
   const SPELLS = {
     'Chronomancer': [
@@ -507,9 +507,9 @@
 
   function xpLevel(xp) {
     for (let i = LEVEL_XP.length - 1; i >= 0; i--) {
-      if (xp >= LEVEL_XP[i]) return i + 1;
+      if (xp >= LEVEL_XP[i]) return i;
     }
-    return 1;
+    return 0;
   }
 
   function getSelectedWarband(idx) {
@@ -778,7 +778,7 @@
     div.className = 'improvement-row';
     div.id = `imp_${idx}_${rowIdx}`;
 
-    const fromLevel = (oldLevel || 1) + rowIdx;
+    const fromLevel = (oldLevel ?? 0) + rowIdx;
     const toLevel   = fromLevel + 1;
 
     const statOpts = STAT_IMPROVEMENTS.map(o =>

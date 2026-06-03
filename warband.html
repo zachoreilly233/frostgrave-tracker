@@ -433,7 +433,7 @@
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqoifOeC-A09QOyiHCnS0BLMDNo6sz0fTWsel7DcSxzIT05ZWntREg_ED_OGvaSMXu/exec';
 
-  const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
+  const LEVEL_XP = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
 
   const BASE_EFFECTS = {
     'Inn':        'Keep one extra soldier (can be a specialist) at base between games.',
@@ -463,9 +463,9 @@
 
   function xpLevel(xp) {
     for (let i = LEVEL_XP.length - 1; i >= 0; i--) {
-      if (xp >= LEVEL_XP[i]) return i + 1;
+      if (xp >= LEVEL_XP[i]) return i;
     }
-    return 1;
+    return 0;
   }
 
   function spellRelation(wizSchool, spellSchool) {
@@ -503,8 +503,8 @@
     // Hero
     const xp    = Number(wb.xp) || 0;
     const level = xpLevel(xp);
-    const lo    = LEVEL_XP[level - 1];
-    const hi    = LEVEL_XP[level] ?? lo + 1000;
+    const lo    = LEVEL_XP[level];
+    const hi    = LEVEL_XP[level + 1] ?? lo + 100;
     const pct   = level >= 10 ? 100 : Math.round((xp - lo) / (hi - lo) * 100);
 
     document.getElementById('hero-name').textContent   = wb.wizard_name;
@@ -512,7 +512,7 @@
     document.getElementById('hero-player').textContent = wb.player_name;
     document.getElementById('hero-level').textContent  = level;
     document.getElementById('xp-current').textContent  = xp + ' XP';
-    document.getElementById('xp-next').textContent     = level < 10 ? hi + ' to next level' : 'Max Level';
+    document.getElementById('xp-next').textContent     = level < 10 ? `${hi - xp} xp to level ${level + 1}` : 'Max Level';
     document.getElementById('xp-bar').style.width      = pct + '%';
 
     // Wizard stats
