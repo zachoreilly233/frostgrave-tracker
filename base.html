@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frostgrave — Base of Operations</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+    :root {
+      --ice:    #c8dfe8;
+      --deep:   #0d1f2d;
+      --frost:  #7ab3c8;
+      --stone:  #2a3a47;
+      --rune:   #a0c4d8;
+      --gold:   #c9a84c;
+      --danger: #8b3a3a;
+      --text:   #dce8ef;
+      --muted:  #6a8a9a;
+      --border: #2e4a5a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--deep);
+      background-image:
+        radial-gradient(ellipse at 20% 0%, #1a3a4a 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 100%, #0a1a28 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23162a38' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      color: var(--text);
+      font-family: 'Crimson Text', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    .container { max-width: 820px; margin: 0 auto; }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 2.2rem;
+      color: var(--ice);
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 40px rgba(122,179,200,0.3);
+      margin-bottom: 0.3rem;
+    }
+
+    header p { color: var(--muted); font-style: italic; font-size: 1rem; }
+
+    .section {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.6rem 2rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--frost);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .field { margin-bottom: 1.1rem; }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-family: 'Cinzel', serif;
+      color: var(--rune);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.3rem;
+    }
+
+    select, input {
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text);
+      font-family: 'Crimson Text', serif;
+      font-size: 1rem;
+      padding: 0.5rem 0.75rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    select:focus, input:focus { border-color: var(--frost); }
+    select option { background: var(--deep); }
+
+    /* Base type cards */
+    .base-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.7rem;
+      margin-top: 0.5rem;
+    }
+
+    .base-card {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.9rem 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    .base-card:hover { border-color: var(--frost); background: rgba(122,179,200,0.05); }
+
+    .base-card.selected {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.08);
+    }
+
+    .base-card.selected .base-card-name { color: var(--gold); }
+
+    .base-card-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--ice);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+
+    .base-card-effect {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .base-card .selected-mark {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.7rem;
+      font-size: 0.7rem;
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+      opacity: 0;
+    }
+
+    .base-card.selected .selected-mark { opacity: 1; }
+
+    /* Warning banner */
+    .warning-banner {
+      background: rgba(139,58,58,0.15);
+      border: 1px solid rgba(139,58,58,0.4);
+      border-radius: 3px;
+      color: #c08080;
+      font-size: 0.9rem;
+      padding: 0.7rem 1rem;
+      margin-top: 1rem;
+    }
+
+    /* Upgrade list */
+    .upgrade-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+    .upgrade-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: start;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.85rem 1rem;
+      background: rgba(0,0,0,0.15);
+      transition: border-color 0.2s;
+    }
+
+    .upgrade-row.owned {
+      border-color: rgba(201,168,76,0.3);
+      background: rgba(201,168,76,0.05);
+    }
+
+    .upgrade-row.owned .upgrade-name { color: var(--gold); }
+
+    .upgrade-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--ice);
+      margin-bottom: 0.2rem;
+    }
+
+    .upgrade-effect { font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
+
+    .upgrade-action { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; min-width: 90px; }
+
+    .upgrade-cost {
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    .btn-purchase {
+      background: rgba(122,179,200,0.1);
+      border: 1px solid var(--frost);
+      border-radius: 3px;
+      color: var(--frost);
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.07em;
+      padding: 0.3rem 0.7rem;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-purchase:hover:not(:disabled) { background: rgba(122,179,200,0.2); }
+
+    .btn-purchase:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-sell {
+      background: rgba(139,58,58,0.1);
+      border: 1px solid rgba(139,58,58,0.5);
+      border-radius: 3px;
+      color: #c08080;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.07em;
+      padding: 0.3rem 0.7rem;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-sell:hover { background: rgba(139,58,58,0.2); }
+
+    .owned-badge {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+    }
+
+    /* Gold bar */
+    .gold-bar {
+      background: rgba(201,168,76,0.07);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 3px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 0.4rem 1rem;
+    }
+
+    .gold-bar-item { font-size: 0.88rem; color: var(--muted); }
+    .gold-bar-item b { color: var(--gold); }
+    .gold-bar-item.remaining { color: var(--ice); }
+    .gold-bar-item.remaining b { color: var(--ice); font-size: 1.05rem; }
+    .gold-bar-item.negative b { color: #c08080; }
+
+    /* Submit */
+    .btn-submit {
+      background: linear-gradient(135deg, #1a3a50, #0d2535);
+      border: 1px solid var(--frost);
+      border-radius: 3px;
+      color: var(--ice);
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      padding: 1rem 2rem;
+      text-transform: uppercase;
+      transition: all 0.25s;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover:not(:disabled) { background: linear-gradient(135deg, #22485f, #152d40); box-shadow: 0 0 20px rgba(122,179,200,0.2); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .status-msg { border-radius: 3px; font-style: italic; margin-top: 1rem; padding: 0.8rem 1rem; text-align: center; display: none; }
+    .status-msg.success { background: rgba(50,120,80,0.2); border: 1px solid #3a7a50; color: #7acca0; display: block; }
+    .status-msg.error   { background: rgba(139,58,58,0.2); border: 1px solid var(--danger); color: #c08080; display: block; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 560px) {
+      .base-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Base of Operations</h1>
+    <p>Choose your home in the ruins and invest in its resources</p>
+  </header>
+
+  <!-- WARBAND SELECT -->
+  <div class="section">
+    <div class="section-title">Warband</div>
+    <div class="field">
+      <label>Select Your Warband</label>
+      <select id="wb_select" onchange="onWarbandSelect()">
+        <option value="">— Select warband —</option>
+      </select>
+    </div>
+    <div id="wb_status" class="hidden" style="font-size:0.9rem; color:var(--muted); font-style:italic;"></div>
+  </div>
+
+  <!-- BASE TYPE -->
+  <div class="section hidden" id="base-type-section">
+    <div class="section-title">Base Location</div>
+    <p style="font-size:0.9rem; color:var(--muted); margin-bottom:1rem;">
+      Choosing a base is free. You may change it after any game, but all purchased upgrades will be lost.
+    </p>
+    <div class="base-grid" id="base-grid"></div>
+    <div class="warning-banner hidden" id="change-warning">
+      Changing your base will permanently lose all current upgrades. Gold spent on them is not refunded.
+    </div>
+  </div>
+
+  <!-- UPGRADES -->
+  <div class="section hidden" id="upgrades-section">
+    <div class="section-title">Base Resources</div>
+    <p style="font-size:0.9rem; color:var(--muted); margin-bottom:1rem;">
+      Each resource may only be purchased once. Resources are lost if you change your base location.
+    </p>
+
+    <div class="gold-bar" id="gold-bar">
+      <div class="gold-bar-item"><b id="gs-available">—</b><br>Available</div>
+      <div class="gold-bar-item"><b id="gs-spent">−0 gc</b><br>Spending</div>
+      <div class="gold-bar-item remaining"><b id="gs-remaining">—</b><br>Remaining</div>
+    </div>
+
+    <div class="upgrade-list" id="upgrade-list"></div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="section hidden" id="submit-section">
+    <div class="section-title">Save Changes</div>
+    <button class="btn-submit" id="submit-btn" onclick="submitBase()">Save Base</button>
+    <div class="status-msg" id="status-msg"></div>
+  </div>
+
+</div>
+<script>
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyrAmSOiyJ-JT04DJTGCOnY4SO0Vx8XtJxLkufyJR2IfKFsV_nuIsqx8QDHsUxpmll5/exec';
+
+  const BASE_TYPES = [
+    {
+      name: 'Inn',
+      effect: 'Keep one extra soldier (can be a specialist) at base. They sit out each game but can be swapped between games. Still capped at 8 soldiers in-game, 4 specialists.'
+    },
+    {
+      name: 'Temple',
+      effect: '+3 to Miraculous Cure castings. Roll after each game: on 17–18, receive a free Potion of Healing.'
+    },
+    {
+      name: 'Crypt',
+      effect: '+2 bonus to all Raise Zombie and Animate Skull castings, whether in-game or Out of Game.'
+    },
+    {
+      name: 'Tower',
+      effect: '+2 to Casting Rolls for Reveal Secret and Awareness.'
+    },
+    {
+      name: 'Treasury',
+      effect: 'After each game, roll a die: 2–16 = that many gc; 17–18 = 100gc; 19–20 = a treasure token.'
+    },
+    {
+      name: 'Brewery',
+      effect: 'All soldiers start each game with +1 Will. Warband gains an additional 20gc after each game.'
+    },
+    {
+      name: 'Library',
+      effect: 'Roll after each game: 15–18 = random scroll; 19–20 = random grimoire.'
+    },
+    {
+      name: 'Laboratory',
+      effect: 'Wizard gains +20 XP after each game. Does not count toward the 300 XP per-game cap.'
+    },
+  ];
+
+  const UPGRADES = [
+    { name: 'Kennel',                cost: 400, effect: 'Keep one War Hound or wolf above the normal soldier limit — bring 8 soldiers plus one war hound/wolf.' },
+    { name: 'Giant Cauldron',        cost: 250, effect: '+1 to Casting Rolls for Brew Potion.' },
+    { name: "Enchanter's Workshop",  cost: 400, effect: '+1 to Casting Rolls for Animate Construct and Embed Enchantment.' },
+    { name: 'Crystal Ball',          cost: 250, effect: '+1 to Casting Rolls for Reveal Secret.' },
+    { name: 'Scriptorium',           cost: 200, effect: '+1 to Casting Rolls for Write Scroll.' },
+    { name: 'Celestial Telescope',   cost: 250, effect: 'Once per game, add +5 to one Initiative Roll before the dice are rolled.' },
+    { name: 'Summoning Circle',      cost: 300, effect: 'Attempt to summon a demon before each game (Out of Game Summon Demon + Control Demon). The demon joins as a temporary member outside the warband limit.' },
+    { name: 'Carrier Pigeons',       cost: 50,  effect: 'Soldiers hired by the wizard cost 10gc less.' },
+    { name: 'Arcane Candle',         cost: 100, effect: '+1 to Casting Rolls for Control Demon spells cast Out of Game.' },
+    { name: 'Summoning Candle',      cost: 100, effect: '+1 to Casting Rolls for Summon Demon spells cast Out of Game.' },
+    { name: 'Sarcophagus of Healing',cost: 300, effect: 'Wizard does not miss a game or pay a fee when Badly Wounded, and pays 10gc less for any Niggling Injuries.' },
+  ];
+
+  let warbandData  = [];
+  let selectedWbId = '';
+  let currentBase  = '';   // base type already saved in sheet
+  let currentUpgrades = new Set(); // upgrade names already saved in sheet
+  let pendingBase  = '';   // what the user has selected this session
+  let pendingUpgrades = new Set(); // upgrades user has added this session (not yet saved)
+
+  async function loadWarbands() {
+    try {
+      const res  = await fetch(APPS_SCRIPT_URL + '?action=getWarbands');
+      const data = await res.json();
+      if (data.success) {
+        warbandData = data.warbands.filter(w => w.status === 'active');
+        const sel = document.getElementById('wb_select');
+        warbandData.forEach(wb => {
+          const opt = document.createElement('option');
+          opt.value = wb.warband_id;
+          opt.textContent = `${wb.wizard_name} (${wb.player_name})`;
+          sel.appendChild(opt);
+        });
+      }
+    } catch (e) { console.warn('Could not load warbands:', e); }
+  }
+
+  loadWarbands();
+
+  function getWarband() {
+    return warbandData.find(w => w.warband_id === selectedWbId) || null;
+  }
+
+  function onWarbandSelect() {
+    selectedWbId = document.getElementById('wb_select').value;
+    const wb = getWarband();
+    if (!wb) {
+      ['base-type-section','upgrades-section','submit-section'].forEach(id =>
+        document.getElementById(id).classList.add('hidden'));
+      return;
+    }
+
+    // Load saved state
+    currentBase     = wb.base_type || '';
+    currentUpgrades = new Set((wb.base_upgrades || '').split(',').map(s => s.trim()).filter(Boolean));
+    pendingBase     = currentBase;
+    pendingUpgrades = new Set(currentUpgrades);
+
+    // Status line
+    const statusEl = document.getElementById('wb_status');
+    statusEl.classList.remove('hidden');
+    statusEl.textContent = currentBase
+      ? `Current base: ${currentBase}  ·  ${currentUpgrades.size} upgrade${currentUpgrades.size !== 1 ? 's' : ''}`
+      : 'No base established yet';
+
+    buildBaseGrid();
+    buildUpgradeList();
+    updateGoldBar();
+
+    document.getElementById('base-type-section').classList.remove('hidden');
+    document.getElementById('upgrades-section').classList.remove('hidden');
+    document.getElementById('submit-section').classList.remove('hidden');
+  }
+
+  // ── BASE TYPE GRID ────────────────────────────────────────────────
+
+  function buildBaseGrid() {
+    const grid = document.getElementById('base-grid');
+    grid.innerHTML = '';
+    BASE_TYPES.forEach(bt => {
+      const card = document.createElement('div');
+      card.className = 'base-card' + (pendingBase === bt.name ? ' selected' : '');
+      card.dataset.name = bt.name;
+      card.onclick = () => selectBase(bt.name);
+      card.innerHTML = `
+        <div class="selected-mark">Selected</div>
+        <div class="base-card-name">${bt.name}</div>
+        <div class="base-card-effect">${bt.effect}</div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function selectBase(name) {
+    pendingBase = name;
+
+    // Update card visuals
+    document.querySelectorAll('.base-card').forEach(c => {
+      c.classList.toggle('selected', c.dataset.name === name);
+    });
+
+    // Show warning only if changing from an existing base that has upgrades
+    const warning = document.getElementById('change-warning');
+    const isChanging = currentBase && currentBase !== name && currentUpgrades.size > 0;
+    warning.classList.toggle('hidden', !isChanging);
+
+    // If changing base, wipe pending upgrades
+    if (currentBase && currentBase !== name) {
+      pendingUpgrades = new Set();
+    } else if (name === currentBase) {
+      pendingUpgrades = new Set(currentUpgrades);
+    }
+
+    buildUpgradeList();
+    updateGoldBar();
+  }
+
+  // ── UPGRADE LIST ──────────────────────────────────────────────────
+
+  function buildUpgradeList() {
+    const list = document.getElementById('upgrade-list');
+    list.innerHTML = '';
+
+    UPGRADES.forEach(upg => {
+      const owned   = pendingUpgrades.has(upg.name);
+      const row = document.createElement('div');
+      row.className = 'upgrade-row' + (owned ? ' owned' : '');
+      row.id = 'upg-row-' + upg.name.replace(/\W+/g, '_');
+
+      const action = owned
+        ? `<span class="owned-badge">Owned</span>
+           <button class="btn-sell" onclick="sellUpgrade('${upg.name}')">Remove</button>`
+        : `<button class="btn-purchase" id="upg-btn-${upg.name.replace(/\W+/g,'_')}"
+             onclick="buyUpgrade('${upg.name}', ${upg.cost})">Purchase</button>`;
+
+      row.innerHTML = `
+        <div>
+          <div class="upgrade-name">${upg.name}</div>
+          <div class="upgrade-effect">${upg.effect}</div>
+        </div>
+        <div class="upgrade-action">
+          <span class="upgrade-cost">${upg.cost} gc</span>
+          ${action}
+        </div>
+      `;
+      list.appendChild(row);
+    });
+
+    checkAffordability();
+  }
+
+  function buyUpgrade(name, cost) {
+    const wb = getWarband();
+    if (!wb) return;
+    const available = (parseInt(wb.gold) || 0) - getSpending();
+    if (cost > available) return;
+    pendingUpgrades.add(name);
+    buildUpgradeList();
+    updateGoldBar();
+  }
+
+  function sellUpgrade(name) {
+    // Only allow removing upgrades that weren't already saved to the sheet
+    if (currentUpgrades.has(name) && pendingBase === currentBase) {
+      // Removing a saved upgrade — allowed (it costs the warband the gc permanently)
+      // Just remove from pending; on submit the sheet will be updated
+    }
+    pendingUpgrades.delete(name);
+    buildUpgradeList();
+    updateGoldBar();
+  }
+
+  function getSpending() {
+    const wb = getWarband();
+    if (!wb) return 0;
+
+    let spend = 0;
+    // If base changed, all current upgrades are lost — no refund, but also no new cost for existing ones
+    const baseChanged = currentBase !== pendingBase;
+
+    pendingUpgrades.forEach(name => {
+      // Only count cost if it's a new purchase (wasn't in current upgrades, or base changed)
+      const isNew = !currentUpgrades.has(name) || baseChanged;
+      if (isNew) {
+        const upg = UPGRADES.find(u => u.name === name);
+        if (upg) spend += upg.cost;
+      }
+    });
+    return spend;
+  }
+
+  function updateGoldBar() {
+    const wb = getWarband();
+    const gold = wb ? (parseInt(wb.gold) || 0) : null;
+    const spending = getSpending();
+    const remaining = gold !== null ? gold - spending : null;
+
+    document.getElementById('gs-available').textContent  = gold !== null ? gold + ' gc' : '—';
+    document.getElementById('gs-spent').textContent      = '−' + spending + ' gc';
+    document.getElementById('gs-remaining').textContent  = remaining !== null ? remaining + ' gc' : '—';
+
+    const remEl = document.getElementById('gs-remaining').parentElement;
+    remEl.classList.toggle('negative', remaining !== null && remaining < 0);
+
+    checkAffordability();
+  }
+
+  function checkAffordability() {
+    const wb = getWarband();
+    if (!wb) return;
+    const available = (parseInt(wb.gold) || 0) - getSpending();
+
+    UPGRADES.forEach(upg => {
+      const key = 'upg-btn-' + upg.name.replace(/\W+/g, '_');
+      const btn = document.getElementById(key);
+      if (btn) btn.disabled = upg.cost > available;
+    });
+  }
+
+  // ── SUBMIT ────────────────────────────────────────────────────────
+
+  async function submitBase() {
+    const btn = document.getElementById('submit-btn');
+    const msg = document.getElementById('status-msg');
+    msg.className = 'status-msg';
+
+    if (!selectedWbId) {
+      msg.className = 'status-msg error';
+      msg.textContent = 'No warband selected.';
+      return;
+    }
+
+    const baseChanged    = pendingBase !== currentBase;
+    const upgradesArray  = Array.from(pendingUpgrades);
+    const goldSpent      = getSpending();
+
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'updateBase',
+          warband_id:  selectedWbId,
+          base_type:   pendingBase,
+          upgrades:    upgradesArray,
+          gold_spent:  goldSpent,
+          base_changed: baseChanged
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        msg.className = 'status-msg success';
+        msg.textContent = 'Base saved. The ruins have been claimed.';
+        btn.textContent = 'Saved';
+
+        // Update local state so the page reflects the new truth
+        currentBase     = pendingBase;
+        currentUpgrades = new Set(pendingUpgrades);
+        const wb = getWarband();
+        if (wb) {
+          wb.base_type     = currentBase;
+          wb.base_upgrades = upgradesArray.join(',');
+          wb.gold          = String((parseInt(wb.gold) || 0) - goldSpent);
+        }
+        document.getElementById('wb_status').textContent =
+          `Current base: ${currentBase}  ·  ${currentUpgrades.size} upgrade${currentUpgrades.size !== 1 ? 's' : ''}`;
+        document.getElementById('change-warning').classList.add('hidden');
+        updateGoldBar();
+        buildUpgradeList();
+      } else {
+        throw new Error(data.error || 'Unknown error');
+      }
+    } catch (err) {
+      msg.className = 'status-msg error';
+      msg.textContent = 'Something went wrong: ' + err.message;
+      btn.disabled = false;
+      btn.textContent = 'Save Base';
+    }
+  }
+</script>
+</body>
+</html>

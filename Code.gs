@@ -18,6 +18,7 @@ function doPost(e) {
       case 'addSoldier':       result = addSoldier(data);       break;
       case 'addSpell':         result = addSpell(data);         break;
       case 'submitGame':       result = submitGame(data);       break;
+      case 'updateBase':       result = updateBase(data);       break;
       case 'getWarbands':      result = getWarbands();          break;
       case 'getWarband':       result = getWarband(data);       break;
       default:
@@ -434,6 +435,43 @@ function appendTransaction(txnSheet, warband_id, game_id, type,
   const txn_id = generateId('TXN', txnSheet);
   txnSheet.appendRow([txn_id, warband_id, game_id, type,
                       description, gold_delta, xp_delta, timestamp]);
+}
+
+
+// =============================================================================
+// BASE OF OPERATIONS
+// =============================================================================
+
+function updateBase(data) {
+  const ss       = SpreadsheetApp.openById(SHEET_ID);
+  const wbSheet  = ss.getSheetByName('WARBANDS');
+  const txnSheet = ss.getSheetByName('TRANSACTIONS');
+  const timestamp = new Date();
+
+  const rows    = wbSheet.getDataRange().getValues();
+  const headers = rows[0];
+  const baseTypeCol     = headers.indexOf('base_type') + 1;
+  const baseUpgradesCol = headers.indexOf('base_upgrades') + 1;
+
+  if (baseTypeCol < 1 || baseUpgradesCol < 1) {
+    return { success: false, error: 'WARBANDS sheet is missing base_type or base_upgrades columns. Please add them.' };
+  }
+
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === data.warband_id) {
+      wbSheet.getRange(i + 1, baseTypeCol).setValue(data.base_type || '');
+      wbSheet.getRange(i + 1, baseUpgradesCol).setValue((data.upgrades || []).join(','));
+
+      if (data.gold_spent > 0) {
+        updateWarbandGold(wbSheet, data.warband_id, -data.gold_spent);
+        appendTransaction(txnSheet, data.warband_id, 'BASE', 'purchase',
+          'Base upgrades purchased', -data.gold_spent, 0, timestamp);
+      }
+      break;
+    }
+  }
+
+  return { success: true };
 }
 
 
