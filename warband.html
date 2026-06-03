@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frostgrave — Warband</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+    :root {
+      --ice:    #c8dfe8;
+      --deep:   #0d1f2d;
+      --frost:  #7ab3c8;
+      --stone:  #2a3a47;
+      --rune:   #a0c4d8;
+      --gold:   #c9a84c;
+      --danger: #8b3a3a;
+      --text:   #dce8ef;
+      --muted:  #6a8a9a;
+      --border: #2e4a5a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--deep);
+      background-image:
+        radial-gradient(ellipse at 20% 0%, #1a3a4a 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 100%, #0a1a28 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23162a38' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      color: var(--text);
+      font-family: 'Crimson Text', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 0 0 5rem;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 2.5rem 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      background: radial-gradient(ellipse at 50% 0%, rgba(122,179,200,0.06) 0%, transparent 70%);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--frost); }
+
+    .hero-inner { max-width: 900px; margin: 0 auto; }
+
+    .hero-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-name {
+      font-family: 'Cinzel', serif;
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: var(--ice);
+      letter-spacing: 0.05em;
+      text-shadow: 0 0 40px rgba(122,179,200,0.2);
+      line-height: 1.1;
+    }
+
+    .hero-school {
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--frost);
+      margin-top: 0.35rem;
+    }
+
+    .hero-player { font-size: 0.9rem; color: var(--muted); margin-top: 0.2rem; }
+
+    .level-block { text-align: right; flex-shrink: 0; }
+
+    .level-num {
+      font-family: 'Cinzel', serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .level-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .xp-bar-wrap { margin-top: 1.2rem; }
+
+    .xp-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .xp-bar-track {
+      height: 5px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .xp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--frost), var(--ice));
+      border-radius: 3px;
+    }
+
+    /* ── LAYOUT ── */
+    .content { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 1.4rem 1.6rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--frost);
+      margin-bottom: 1.1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── STATS ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.6rem;
+    }
+
+    .stat-block {
+      text-align: center;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.6rem 0.4rem;
+    }
+
+    .stat-value {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--ice);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+    }
+
+    .apprentice-header {
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 1rem 0 0.6rem;
+    }
+
+    /* ── SPELLS ── */
+    .spell-group { margin-bottom: 1rem; }
+    .spell-group:last-child { margin-bottom: 0; }
+
+    .spell-group-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .spell-list { display: flex; flex-direction: column; gap: 0.3rem; }
+
+    .spell-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.4rem 0.7rem;
+      background: rgba(0,0,0,0.15);
+      border-radius: 3px;
+      font-size: 0.92rem;
+    }
+
+    .spell-name { color: var(--text); }
+
+    .spell-cn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      color: var(--frost);
+      letter-spacing: 0.05em;
+    }
+
+    .spell-cn-improved { color: var(--gold); }
+
+    /* ── SOLDIERS ── */
+    .soldier-list { display: flex; flex-direction: column; gap: 0.35rem; }
+
+    .soldier-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.45rem 0.7rem;
+      border-radius: 3px;
+      font-size: 0.92rem;
+    }
+
+    .soldier-row.active    { background: rgba(0,0,0,0.15); }
+    .soldier-row.recovering { background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.2); }
+    .soldier-row.dead      { background: rgba(139,58,58,0.07); opacity: 0.55; }
+
+    .soldier-name { color: var(--text); }
+    .soldier-type { font-size: 0.82rem; color: var(--muted); }
+
+    .soldier-status {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.5rem;
+      border-radius: 2px;
+    }
+
+    .status-active     { color: var(--frost); }
+    .status-recovering { color: var(--gold); }
+    .status-dead       { color: #8a5050; }
+
+    /* ── BASE ── */
+    .base-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      color: var(--gold);
+      margin-bottom: 0.4rem;
+    }
+
+    .base-effect { font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem; }
+
+    .upgrade-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    .upgrade-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      color: var(--rune);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 0.2rem 0.6rem;
+    }
+
+    /* ── ITEMS ── */
+    .item-list { display: flex; flex-direction: column; gap: 0.3rem; }
+
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.4rem 0.7rem;
+      background: rgba(0,0,0,0.15);
+      border-radius: 3px;
+      font-size: 0.92rem;
+    }
+
+    .item-type {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── INJURIES ── */
+    .injury-list { display: flex; flex-direction: column; gap: 0.35rem; }
+
+    .injury-row {
+      padding: 0.5rem 0.7rem;
+      background: rgba(139,58,58,0.08);
+      border: 1px solid rgba(139,58,58,0.2);
+      border-radius: 3px;
+      font-size: 0.9rem;
+    }
+
+    .injury-target {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9a6060;
+      margin-bottom: 0.1rem;
+    }
+
+    .injury-desc { color: var(--text); }
+
+    /* ── GOLD ── */
+    .gold-display {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      color: var(--gold);
+    }
+
+    .gold-display span { font-size: 0.9rem; color: var(--muted); margin-left: 0.3rem; }
+
+    .empty-note { color: var(--muted); font-style: italic; font-size: 0.9rem; }
+
+    .two-col-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 560px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .hero-name  { font-size: 1.9rem; }
+      .two-col-stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <a class="back-link" href="dashboard.html">← Campaign</a>
+    <div class="hero-top">
+      <div>
+        <div class="hero-name" id="hero-name">—</div>
+        <div class="hero-school" id="hero-school"></div>
+        <div class="hero-player" id="hero-player"></div>
+      </div>
+      <div class="level-block">
+        <div class="level-num" id="hero-level">—</div>
+        <div class="level-label">Level</div>
+      </div>
+    </div>
+    <div class="xp-bar-wrap">
+      <div class="xp-bar-labels">
+        <span id="xp-current">— XP</span>
+        <span id="xp-next"></span>
+      </div>
+      <div class="xp-bar-track">
+        <div class="xp-bar-fill" id="xp-bar" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="two-col-stats">
+    <!-- WIZARD STATS -->
+    <div class="card">
+      <div class="card-title" id="wizard-stats-title">Wizard</div>
+      <div class="stats-grid" id="wizard-stats"></div>
+      <div class="apprentice-header" id="apprentice-name-header"></div>
+      <div class="stats-grid" id="apprentice-stats"></div>
+    </div>
+
+    <!-- GOLD -->
+    <div class="card">
+      <div class="card-title">Treasury</div>
+      <div class="gold-display" id="gold-display">— <span>gc</span></div>
+    </div>
+  </div>
+
+  <!-- SPELLS -->
+  <div class="card">
+    <div class="card-title">Known Spells</div>
+    <div id="spells-content"></div>
+  </div>
+
+  <!-- SOLDIERS -->
+  <div class="card">
+    <div class="card-title">Warband</div>
+    <div id="soldiers-content"></div>
+  </div>
+
+  <!-- BASE -->
+  <div class="card" id="base-card">
+    <div class="card-title">Base of Operations</div>
+    <div id="base-content"></div>
+  </div>
+
+  <!-- ITEMS -->
+  <div class="card" id="items-card">
+    <div class="card-title">Items &amp; Treasure</div>
+    <div id="items-content"></div>
+  </div>
+
+  <!-- INJURIES -->
+  <div class="card" id="injuries-card">
+    <div class="card-title">Injuries on Record</div>
+    <div id="injuries-content"></div>
+  </div>
+
+</div>
+
+<script>
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqoifOeC-A09QOyiHCnS0BLMDNo6sz0fTWsel7DcSxzIT05ZWntREg_ED_OGvaSMXu/exec';
+
+  const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
+
+  const BASE_EFFECTS = {
+    'Inn':        'Keep one extra soldier (can be a specialist) at base between games.',
+    'Temple':     '+3 to Miraculous Cure castings. On 17–18 after each game: free Potion of Healing.',
+    'Crypt':      '+2 to Raise Zombie and Animate Skull castings, in-game or Out of Game.',
+    'Tower':      '+2 to Casting Rolls for Reveal Secret and Awareness.',
+    'Treasury':   'After each game, roll a die: 2–16 = that many gc; 17–18 = 100gc; 19–20 = a treasure token.',
+    'Brewery':    'All soldiers start each game with +1 Will. Warband gains +20gc after each game.',
+    'Library':    'Roll after each game: 15–18 = random scroll; 19–20 = random grimoire.',
+    'Laboratory': 'Wizard gains +20 XP after each game (doesn\'t count toward 300 XP cap).',
+  };
+
+  const SCHOOL_RELATIONS = {
+    'Chronomancer': { allied: ['Elementalist', 'Necromancer', 'Soothsayer'], opposed: 'Enchanter' },
+    'Elementalist':  { allied: ['Chronomancer', 'Enchanter', 'Summoner'],    opposed: 'Illusionist' },
+    'Enchanter':     { allied: ['Elementalist', 'Sigilist', 'Witch'],        opposed: 'Chronomancer' },
+    'Illusionist':   { allied: ['Sigilist', 'Soothsayer', 'Thaumaturge'],    opposed: 'Elementalist' },
+    'Necromancer':   { allied: ['Chronomancer', 'Summoner', 'Witch'],        opposed: 'Thaumaturge' },
+    'Sigilist':      { allied: ['Enchanter', 'Illusionist', 'Thaumaturge'],  opposed: 'Summoner' },
+    'Soothsayer':    { allied: ['Chronomancer', 'Illusionist', 'Thaumaturge'], opposed: 'Witch' },
+    'Summoner':      { allied: ['Elementalist', 'Necromancer', 'Witch'],     opposed: 'Sigilist' },
+    'Thaumaturge':   { allied: ['Illusionist', 'Sigilist', 'Soothsayer'],    opposed: 'Necromancer' },
+    'Witch':         { allied: ['Enchanter', 'Necromancer', 'Summoner'],     opposed: 'Soothsayer' },
+  };
+
+  const ITEM_LABELS = { potion:'Potion', scroll:'Scroll', grimoire:'Grimoire', magic_weapon:'Magic Weapon', magic_armour:'Magic Armour', magic_item:'Magic Item' };
+
+  function xpLevel(xp) {
+    for (let i = LEVEL_XP.length - 1; i >= 0; i--) {
+      if (xp >= LEVEL_XP[i]) return i + 1;
+    }
+    return 1;
+  }
+
+  function spellRelation(wizSchool, spellSchool) {
+    if (spellSchool === wizSchool) return 'Domain';
+    const rel = SCHOOL_RELATIONS[wizSchool];
+    if (!rel) return 'Neutral';
+    if (rel.allied.includes(spellSchool)) return 'Allied';
+    return 'Neutral';
+  }
+
+  function statBlock(stats) {
+    return stats.map(([label, val]) => `
+      <div class="stat-block">
+        <span class="stat-value">${val ?? '—'}</span>
+        <span class="stat-label">${label}</span>
+      </div>
+    `).join('');
+  }
+
+  async function load() {
+    const params = new URLSearchParams(location.search);
+    const wbId   = params.get('id');
+    if (!wbId) { document.getElementById('hero-name').textContent = 'Warband not found'; return; }
+
+    const res  = await fetch(APPS_SCRIPT_URL + '?action=getWarband&warband_id=' + wbId);
+    const data = await res.json();
+    if (!data.success) { document.getElementById('hero-name').textContent = 'Could not load warband'; return; }
+
+    render(data.warband);
+  }
+
+  function render(wb) {
+    document.title = `${wb.wizard_name} — Frostgrave`;
+
+    // Hero
+    const xp    = Number(wb.xp) || 0;
+    const level = xpLevel(xp);
+    const lo    = LEVEL_XP[level - 1];
+    const hi    = LEVEL_XP[level] ?? lo + 1000;
+    const pct   = level >= 10 ? 100 : Math.round((xp - lo) / (hi - lo) * 100);
+
+    document.getElementById('hero-name').textContent   = wb.wizard_name;
+    document.getElementById('hero-school').textContent = wb.school;
+    document.getElementById('hero-player').textContent = wb.player_name;
+    document.getElementById('hero-level').textContent  = level;
+    document.getElementById('xp-current').textContent  = xp + ' XP';
+    document.getElementById('xp-next').textContent     = level < 10 ? hi + ' to next level' : 'Max Level';
+    document.getElementById('xp-bar').style.width      = pct + '%';
+
+    // Wizard stats
+    document.getElementById('wizard-stats-title').textContent = wb.wizard_name;
+    document.getElementById('wizard-stats').innerHTML = statBlock([
+      ['Move', wb.move], ['Fight', wb.fight], ['Shoot', wb.shoot],
+      ['Armour', wb.armour], ['Will', wb.will], ['Health', wb.health]
+    ]);
+
+    // Apprentice stats
+    document.getElementById('apprentice-name-header').textContent = wb.apprentice_name || 'Apprentice';
+    document.getElementById('apprentice-stats').innerHTML = statBlock([
+      ['Move', wb.apprentice_move], ['Fight', wb.apprentice_fight], ['Shoot', wb.apprentice_shoot],
+      ['Armour', wb.apprentice_armour], ['Will', wb.apprentice_will], ['Health', wb.apprentice_health]
+    ]);
+
+    // Gold
+    document.getElementById('gold-display').innerHTML = `${Number(wb.gold) || 0} <span>gc</span>`;
+
+    // Spells
+    const spells = wb.spells || [];
+    if (spells.length) {
+      const groups = { Domain: [], Allied: [], Neutral: [] };
+      spells.forEach(s => {
+        const rel = spellRelation(wb.school, s.school);
+        groups[rel].push(s);
+      });
+
+      let html = '';
+      ['Domain', 'Allied', 'Neutral'].forEach(grp => {
+        if (!groups[grp].length) return;
+        html += `<div class="spell-group">
+          <div class="spell-group-label">${grp} — ${grp === 'Domain' ? wb.school : groups[grp].map(s => s.school).filter((v,i,a) => a.indexOf(v) === i).join(', ')}</div>
+          <div class="spell-list">
+            ${groups[grp].map(s => {
+              const improved = Number(s.casting_number) < Number(s.base_casting_number);
+              return `<div class="spell-row">
+                <span class="spell-name">${s.spell_name}</span>
+                <span class="spell-cn ${improved ? 'spell-cn-improved' : ''}">CN ${s.casting_number}${improved ? ' ↓' : ''}</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      });
+      document.getElementById('spells-content').innerHTML = html;
+    } else {
+      document.getElementById('spells-content').innerHTML = '<p class="empty-note">No spells recorded.</p>';
+    }
+
+    // Soldiers
+    const soldiers = wb.soldiers || [];
+    if (soldiers.length) {
+      const order = { active: 0, recovering: 1, dead: 2 };
+      const sorted = [...soldiers].sort((a, b) => (order[a.status] ?? 3) - (order[b.status] ?? 3));
+      document.getElementById('soldiers-content').innerHTML = `<div class="soldier-list">
+        ${sorted.map(s => `
+          <div class="soldier-row ${s.status}">
+            <div>
+              <div class="soldier-name">${s.soldier_name}</div>
+              <div class="soldier-type">${s.soldier_type}</div>
+            </div>
+            <span class="soldier-status status-${s.status}">${s.status}</span>
+          </div>
+        `).join('')}
+      </div>`;
+    } else {
+      document.getElementById('soldiers-content').innerHTML = '<p class="empty-note">No soldiers recorded.</p>';
+    }
+
+    // Base
+    const baseName = wb.base_type || '';
+    const baseUpgrades = (wb.base_upgrades || '').split(',').map(s => s.trim()).filter(Boolean);
+    if (baseName) {
+      document.getElementById('base-content').innerHTML = `
+        <div class="base-name">${baseName}</div>
+        <div class="base-effect">${BASE_EFFECTS[baseName] || ''}</div>
+        ${baseUpgrades.length
+          ? `<div class="upgrade-tags">${baseUpgrades.map(u => `<span class="upgrade-tag">${u}</span>`).join('')}</div>`
+          : '<p class="empty-note">No upgrades purchased.</p>'}
+      `;
+    } else {
+      document.getElementById('base-content').innerHTML = '<p class="empty-note">No base established yet.</p>';
+    }
+
+    // Items
+    const items = (wb.items || []).filter(i => i.status === 'active');
+    if (items.length) {
+      document.getElementById('items-content').innerHTML = `<div class="item-list">
+        ${items.map(i => `
+          <div class="item-row">
+            <span>${i.item_name}</span>
+            <span class="item-type">${ITEM_LABELS[i.item_type] || i.item_type}</span>
+          </div>
+        `).join('')}
+      </div>`;
+    } else {
+      document.getElementById('items-content').innerHTML = '<p class="empty-note">No items in inventory.</p>';
+    }
+
+    // Injuries
+    const injuries = wb.injuries || [];
+    if (injuries.length) {
+      document.getElementById('injuries-content').innerHTML = `<div class="injury-list">
+        ${injuries.map(inj => `
+          <div class="injury-row">
+            <div class="injury-target">${inj.target_name || inj.target_type}</div>
+            <div class="injury-desc">${inj.injury_description}</div>
+          </div>
+        `).join('')}
+      </div>`;
+    } else {
+      document.getElementById('injuries-content').innerHTML = '<p class="empty-note">No injuries on record.</p>';
+    }
+  }
+
+  load();
+</script>
+</body>
+</html>

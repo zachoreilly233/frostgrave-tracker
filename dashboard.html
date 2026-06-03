@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frostgrave — Campaign</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+    :root {
+      --ice:    #c8dfe8;
+      --deep:   #0d1f2d;
+      --frost:  #7ab3c8;
+      --stone:  #2a3a47;
+      --rune:   #a0c4d8;
+      --gold:   #c9a84c;
+      --danger: #8b3a3a;
+      --text:   #dce8ef;
+      --muted:  #6a8a9a;
+      --border: #2e4a5a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--deep);
+      background-image:
+        radial-gradient(ellipse at 20% 0%, #1a3a4a 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 100%, #0a1a28 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23162a38' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      color: var(--text);
+      font-family: 'Crimson Text', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 0 0 4rem;
+    }
+
+    /* ── HEADER ── */
+    .campaign-header {
+      text-align: center;
+      padding: 3.5rem 1rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .campaign-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(122,179,200,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .campaign-eyebrow {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      color: var(--frost);
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    .campaign-title {
+      font-family: 'Cinzel', serif;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--ice);
+      letter-spacing: 0.06em;
+      text-shadow: 0 0 60px rgba(122,179,200,0.25);
+      margin-bottom: 0.3rem;
+    }
+
+    .campaign-subtitle {
+      color: var(--muted);
+      font-style: italic;
+      font-size: 1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .campaign-stats {
+      display: inline-flex;
+      gap: 2.5rem;
+      padding: 0.6rem 2rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .campaign-stat {
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    .campaign-stat-value {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--ice);
+      display: block;
+    }
+
+    .campaign-stat-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── LAYOUT ── */
+    .main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+    .section-heading {
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--frost);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── WARBAND GRID ── */
+    .warband-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 3rem;
+    }
+
+    .wb-card {
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: all 0.22s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      overflow: hidden;
+    }
+
+    .wb-card:hover {
+      border-color: var(--frost);
+      background: rgba(122,179,200,0.05);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .wb-card-header {
+      padding: 1.1rem 1.3rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.8rem;
+    }
+
+    .wb-wizard-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ice);
+      line-height: 1.2;
+    }
+
+    .wb-player-name { font-size: 0.85rem; color: var(--muted); margin-top: 0.15rem; }
+
+    .wb-level-badge {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--deep);
+      background: var(--gold);
+      padding: 0.2rem 0.55rem;
+      border-radius: 2px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .wb-card-body { padding: 1rem 1.3rem; }
+
+    .wb-school {
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--frost);
+      margin-bottom: 0.8rem;
+    }
+
+    /* XP bar */
+    .xp-bar-wrap { margin-bottom: 1rem; }
+
+    .xp-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .xp-bar-track {
+      height: 4px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .xp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--frost), var(--ice));
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    .wb-meta {
+      display: flex;
+      gap: 1.2rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .wb-meta-item b { color: var(--text); }
+
+    .wb-base-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 0.1rem 0.45rem;
+      margin-top: 0.6rem;
+      display: inline-block;
+    }
+
+    /* ── GAME LOG ── */
+    .game-log { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .game-row {
+      display: grid;
+      grid-template-columns: 7rem 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.65rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: rgba(255,255,255,0.02);
+      font-size: 0.9rem;
+    }
+
+    .game-date { color: var(--muted); font-size: 0.82rem; }
+    .game-scenario { color: var(--text); }
+    .game-warbands { color: var(--muted); font-size: 0.82rem; text-align: right; }
+
+    .loading { color: var(--muted); font-style: italic; text-align: center; padding: 2rem; }
+
+    @media (max-width: 500px) {
+      .campaign-title { font-size: 2rem; }
+      .campaign-stats { gap: 1.2rem; }
+      .game-row { grid-template-columns: 1fr; gap: 0.2rem; }
+      .game-warbands { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="campaign-header">
+    <div class="campaign-eyebrow">Campaign Record</div>
+    <h1 class="campaign-title">Felstad</h1>
+    <p class="campaign-subtitle">The frozen city gives up its secrets slowly</p>
+    <div class="campaign-stats">
+      <div class="campaign-stat">
+        <span class="campaign-stat-value" id="stat-warbands">—</span>
+        <span class="campaign-stat-label">Warbands</span>
+      </div>
+      <div class="campaign-stat">
+        <span class="campaign-stat-value" id="stat-games">—</span>
+        <span class="campaign-stat-label">Games Played</span>
+      </div>
+      <div class="campaign-stat">
+        <span class="campaign-stat-value" id="stat-soldiers">—</span>
+        <span class="campaign-stat-label">Soldiers Lost</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="section-heading">Warbands</div>
+    <div class="warband-grid" id="warband-grid">
+      <div class="loading">Consulting the archives…</div>
+    </div>
+
+    <div class="section-heading">Recent Games</div>
+    <div class="game-log" id="game-log">
+      <div class="loading">Consulting the archives…</div>
+    </div>
+  </div>
+
+<script>
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqoifOeC-A09QOyiHCnS0BLMDNo6sz0fTWsel7DcSxzIT05ZWntREg_ED_OGvaSMXu/exec';
+
+  const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
+
+  function xpLevel(xp) {
+    for (let i = LEVEL_XP.length - 1; i >= 0; i--) {
+      if (xp >= LEVEL_XP[i]) return i + 1;
+    }
+    return 1;
+  }
+
+  function xpProgress(xp) {
+    const level = xpLevel(xp);
+    const lo = LEVEL_XP[level - 1];
+    const hi = LEVEL_XP[level] ?? lo + 1000;
+    return { level, lo, hi, pct: Math.round((xp - lo) / (hi - lo) * 100) };
+  }
+
+  async function load() {
+    const [wbRes, gmRes] = await Promise.all([
+      fetch(APPS_SCRIPT_URL + '?action=getWarbands'),
+      fetch(APPS_SCRIPT_URL + '?action=getGames')
+    ]);
+    const wbData = await wbRes.json();
+    const gmData = await gmRes.json();
+
+    const warbands = wbData.success ? wbData.warbands.filter(w => w.status === 'active') : [];
+    const games    = gmData.success ? gmData.games : [];
+
+    renderStats(warbands, games);
+    renderWarbands(warbands);
+    renderGames(games);
+  }
+
+  function renderStats(warbands, games) {
+    document.getElementById('stat-warbands').textContent = warbands.length;
+    document.getElementById('stat-games').textContent    = games.length;
+    const dead = warbands.reduce((n, wb) =>
+      n + (wb.soldiers || []).filter(s => s.status === 'dead').length, 0);
+    document.getElementById('stat-soldiers').textContent = dead;
+  }
+
+  function renderWarbands(warbands) {
+    const grid = document.getElementById('warband-grid');
+    if (!warbands.length) { grid.innerHTML = '<div class="loading">No warbands registered yet.</div>'; return; }
+
+    // Sort by XP descending
+    const sorted = [...warbands].sort((a, b) => (Number(b.xp) || 0) - (Number(a.xp) || 0));
+
+    grid.innerHTML = sorted.map(wb => {
+      const xp   = Number(wb.xp) || 0;
+      const prog = xpProgress(xp);
+      const activeSoldiers = (wb.soldiers || []).filter(s => s.status === 'active' || s.status === 'recovering').length;
+      const gold = Number(wb.gold) || 0;
+      const base = wb.base_type || null;
+      const pct  = prog.level >= 10 ? 100 : prog.pct;
+
+      return `
+        <a class="wb-card" href="warband.html?id=${wb.warband_id}">
+          <div class="wb-card-header">
+            <div>
+              <div class="wb-wizard-name">${wb.wizard_name}</div>
+              <div class="wb-player-name">${wb.player_name}</div>
+            </div>
+            <div class="wb-level-badge">LVL ${prog.level}</div>
+          </div>
+          <div class="wb-card-body">
+            <div class="wb-school">${wb.school}</div>
+            <div class="xp-bar-wrap">
+              <div class="xp-bar-labels">
+                <span>${xp} XP</span>
+                <span>${prog.level < 10 ? prog.hi + ' to next' : 'Max Level'}</span>
+              </div>
+              <div class="xp-bar-track">
+                <div class="xp-bar-fill" style="width:${pct}%"></div>
+              </div>
+            </div>
+            <div class="wb-meta">
+              <span class="wb-meta-item"><b>${activeSoldiers}</b> soldiers</span>
+              <span class="wb-meta-item"><b>${gold}</b> gc</span>
+            </div>
+            ${base ? `<div class="wb-base-tag">${base}</div>` : ''}
+          </div>
+        </a>
+      `;
+    }).join('');
+  }
+
+  function renderGames(games) {
+    const log = document.getElementById('game-log');
+    if (!games.length) { log.innerHTML = '<div class="loading">No games recorded yet.</div>'; return; }
+
+    const recent = [...games].reverse().slice(0, 10);
+    log.innerHTML = recent.map(g => {
+      const date = g.date ? new Date(g.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+      const count = g.num_warbands || g['num_warbands'] || '?';
+      return `
+        <div class="game-row">
+          <span class="game-date">${date}</span>
+          <span class="game-scenario">${g.scenario || 'Unknown Scenario'}</span>
+          <span class="game-warbands">${count} warbands</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  load();
+</script>
+</body>
+</html>
