@@ -64,8 +64,15 @@ function doGet(e) {
 
 function generateId(prefix, sheet) {
   const data = sheet.getDataRange().getValues();
-  const count = Math.max(data.length, 1);
-  return prefix + String(count).padStart(3, '0');
+  let maxNum = 0;
+  for (let i = 1; i < data.length; i++) {
+    const id = String(data[i][0]);
+    if (id.startsWith(prefix)) {
+      const num = parseInt(id.substring(prefix.length), 10);
+      if (!isNaN(num) && num > maxNum) maxNum = num;
+    }
+  }
+  return prefix + String(maxNum + 1).padStart(3, '0');
 }
 
 
