@@ -156,3 +156,5 @@ Edit the Google Sheet directly for now (Phase 5 will add a form for this).
 - Campaign dashboard: warband standings, soldier rosters, game history
 - Between-game actions form: purchases, recruitment, spell improvements
 - Map module (separate planning phase — aesthetic-first)
+
+<!-- deploy pipeline check: 2026-08-08T07:30:51Z -->
